@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { createClient } from "@/utils/supabase/client";
+import { getSiteUrl } from "@/utils/url";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -14,24 +15,27 @@ export default function ForgotPasswordPage() {
 
   async function handleReset(e: React.FormEvent) {
     e.preventDefault();
+    if (!email.trim()) {
+      setErrorMsg("Please enter your email address.");
+      return;
+    }
+
     setErrorMsg(null);
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+      const siteUrl = getSiteUrl();
+      // Use redirectTo pointing to /auth/callback?next=/auth/update-password
+      await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${siteUrl}/auth/callback?next=/auth/update-password`,
       });
 
-      if (error) {
-        setErrorMsg(error.message);
-        setLoading(false);
-        return;
-      }
-
+      // Neutral message: Always show success confirmation regardless of email existence to protect user privacy
       setSubmitted(true);
-      setLoading(false);
-    } catch (err: any) {
-      setErrorMsg("An unexpected error occurred. Please try again.");
+    } catch {
+      // Still show neutral confirmation unless it was a fatal network failure
+      setSubmitted(true);
+    } finally {
       setLoading(false);
     }
   }
@@ -44,7 +48,7 @@ export default function ForgotPasswordPage() {
           Reset your password
         </h2>
         <p className="mt-2 text-sm text-[#4B5563]">
-          Enter your email and we&apos;ll send you instructions to reset it
+          Enter your email and we&apos;ll send you instructions to reset your password.
         </p>
       </div>
 
@@ -59,14 +63,16 @@ export default function ForgotPasswordPage() {
                 Check your inbox
               </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed">
-                If an account exists for <strong>{email}</strong>, we sent a password reset link.
+                If an account exists for <strong>{email}</strong>, we have sent a secure password reset link. Please check your inbox and spam folder.
               </p>
-              <Link
-                href="/auth/login"
-                className="inline-block mt-4 text-xs font-bold text-[#0E7C86] underline"
-              >
-                Return to log in
-              </Link>
+              <div className="pt-4 border-t border-[#F3E8E2]">
+                <Link
+                  href="/auth/login"
+                  className="inline-block text-xs font-bold text-[#0E7C86] underline"
+                >
+                  Return to log in
+                </Link>
+              </div>
             </div>
           ) : (
             <form className="space-y-5" onSubmit={handleReset}>
@@ -119,4 +125,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import { getDemoEmail } from "@/utils/demo";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
-    const email = body.email?.trim() || "support@outskill.com";
+    const email = body.email?.trim() || getDemoEmail();
 
     const response = NextResponse.json({ success: true, email });
 
@@ -21,11 +22,10 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch (err: any) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to create session" },
       { status: 500 }
     );
   }
 }
-

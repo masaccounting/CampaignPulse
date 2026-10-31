@@ -1,15 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Logo from "./Logo";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
+interface NavUser {
+  id?: string;
+  email?: string;
+}
+
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<NavUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -41,6 +47,18 @@ export default function Navbar() {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  // Handle Escape key to close mobile menu and return focus to hamburger button
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+        hamburgerRef.current?.focus();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
 
   async function handleLogout() {
     await supabase.auth.signOut().catch(() => {});
@@ -107,8 +125,12 @@ export default function Navbar() {
 
         {/* Mobile Hamburger Toggle */}
         <button
+          ref={hamburgerRef}
+          type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg text-[#4B5563] hover:bg-[#F3E8E2]"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-navigation-menu"
+          className="md:hidden p-2.5 rounded-xl text-[#4B5563] hover:bg-[#F3E8E2] focus-visible:ring-2 focus-visible:ring-[#0E7C86] focus-visible:outline-hidden min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
           aria-label="Toggle Navigation Menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,25 +145,37 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#FFF9F5] border-b border-[#F3E8E2] px-4 pt-2 pb-6 space-y-3">
+        <div
+          id="mobile-navigation-menu"
+          className="md:hidden bg-[#FFF9F5] border-b border-[#F3E8E2] px-4 pt-2 pb-6 space-y-3"
+        >
           <Link
             href="/#how-it-works"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-[#4B5563]"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              hamburgerRef.current?.focus();
+            }}
+            className="block py-2.5 text-base font-medium text-[#4B5563] min-h-[44px] flex items-center"
           >
             How It Works
           </Link>
           <Link
             href="/#sample-calendar"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-[#4B5563]"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              hamburgerRef.current?.focus();
+            }}
+            className="block py-2.5 text-base font-medium text-[#4B5563] min-h-[44px] flex items-center"
           >
             Sample Calendar
           </Link>
           <Link
             href="/#features"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block py-2 text-base font-medium text-[#4B5563]"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              hamburgerRef.current?.focus();
+            }}
+            className="block py-2.5 text-base font-medium text-[#4B5563] min-h-[44px] flex items-center"
           >
             Features
           </Link>
@@ -150,17 +184,22 @@ export default function Navbar() {
               <>
                 <Link
                   href="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-3 rounded-xl font-semibold text-sm text-white bg-[#0E7C86]"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    hamburgerRef.current?.focus();
+                  }}
+                  className="w-full text-center py-3 rounded-xl font-semibold text-sm text-white bg-[#0E7C86] min-h-[44px] flex items-center justify-center"
                 >
                   My Campaigns
                 </Link>
                 <button
+                  type="button"
                   onClick={() => {
                     setMobileMenuOpen(false);
                     handleLogout();
+                    hamburgerRef.current?.focus();
                   }}
-                  className="w-full text-center py-2.5 rounded-xl font-medium text-sm text-[#4B5563] bg-white border border-[#F3E8E2]"
+                  className="w-full text-center py-2.5 rounded-xl font-medium text-sm text-[#4B5563] bg-white border border-[#F3E8E2] min-h-[44px] flex items-center justify-center cursor-pointer"
                 >
                   Log Out
                 </button>
@@ -169,15 +208,21 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 rounded-xl font-semibold text-sm text-[#1F2937] border border-[#F3E8E2] bg-white"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    hamburgerRef.current?.focus();
+                  }}
+                  className="w-full text-center py-2.5 rounded-xl font-semibold text-sm text-[#1F2937] border border-[#F3E8E2] bg-white min-h-[44px] flex items-center justify-center"
                 >
                   Log In
                 </Link>
                 <Link
                   href="/auth/signup"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-3 rounded-xl font-semibold text-sm text-white bg-[#0E7C86]"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    hamburgerRef.current?.focus();
+                  }}
+                  className="w-full text-center py-3 rounded-xl font-semibold text-sm text-white bg-[#0E7C86] min-h-[44px] flex items-center justify-center"
                 >
                   Get Started Free
                 </Link>

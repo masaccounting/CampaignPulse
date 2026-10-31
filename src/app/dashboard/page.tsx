@@ -2,10 +2,30 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
+import { getDemoEmail } from "@/utils/demo";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const dynamic = "force-dynamic";
+
+interface DashboardProfile {
+  business_name?: string;
+  [key: string]: unknown;
+}
+
+interface DashboardCampaign {
+  id: string;
+  goal: string;
+  status: string;
+  title: string;
+  what_you_sell?: string;
+  target_audience_desc?: string;
+  duration_weeks?: number;
+  start_date?: string;
+  posts_per_week?: number;
+  calendar_items?: { count: number }[];
+  [key: string]: unknown;
+}
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -21,11 +41,11 @@ export default async function DashboardPage() {
     redirect("/auth/login");
   }
 
-  const effectiveEmail = user?.email || guestEmail || "support@outskill.com";
+  const effectiveEmail = user?.email || guestEmail || getDemoEmail();
 
   // Fetch user profile and existing campaigns if Supabase user exists
-  let profile: any = null;
-  let campaigns: any[] = [];
+  let profile: DashboardProfile | null = null;
+  let campaigns: DashboardCampaign[] = [];
 
   if (user) {
     const { data: p } = await supabase
@@ -100,7 +120,7 @@ export default async function DashboardPage() {
 
           {campaigns && campaigns.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {campaigns.map((camp: any) => (
+              {campaigns.map((camp: DashboardCampaign) => (
                 <div
                   key={camp.id}
                   className="bg-white rounded-3xl border border-[#F3E8E2] hover:border-[#0E7C86]/40 p-6 transition-all duration-200 hover:shadow-lg flex flex-col justify-between"

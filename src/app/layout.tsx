@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { getSiteUrl } from "@/utils/url";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,18 +13,69 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
-  title: "CampaignPulse | Campaign Intelligence Platform",
-  description: "Real-time political & marketing campaign intelligence powered by Next.js, Supabase, and Gemini AI",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "CampaignPulse — AI Marketing Calendar for Small Businesses",
+    template: "%s | CampaignPulse",
+  },
+  description:
+    "Turn a few details about your business into an editable, ready-to-post marketing calendar with AI-written social copy, ad scripts and creative briefs.",
+  keywords: [
+    "marketing calendar",
+    "small business marketing",
+    "AI marketing planner",
+    "social media calendar",
+    "ad scripts",
+    "content planning",
+  ],
+  authors: [{ name: "CampaignPulse Team" }],
+  creator: "CampaignPulse",
+  openGraph: {
+    title: "CampaignPulse — AI Marketing Calendar for Small Businesses",
+    description:
+      "Turn a few details about your business into an editable, ready-to-post marketing calendar with AI-written social copy, ad scripts and creative briefs.",
+    url: siteUrl,
+    siteName: "CampaignPulse",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CampaignPulse — AI Marketing Calendar for Small Businesses",
+    description:
+      "Turn a few details about your business into an editable, ready-to-post marketing calendar with AI-written social copy, ad scripts and creative briefs.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#FFF9F5] text-[#1F2937]">
+        {/* Skip to Content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#0E7C86] focus:text-white focus:rounded-lg focus:shadow-lg focus:outline-none"
+        >
+          Skip to main content
+        </a>
+        <div id="main-content" className="flex-1 flex flex-col">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

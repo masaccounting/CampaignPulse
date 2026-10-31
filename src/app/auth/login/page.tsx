@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { createClient } from "@/utils/supabase/client";
@@ -15,41 +14,48 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  // Instant 1-Click Access (No Password Required)
-  async function handleInstantAccess(demoEmail = "support@outskill.com") {
+  // Server-side Demo Access (Zero credentials in client code)
+  async function handleDemoAccess() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      // 1. Set server cookie session
-      await fetch("/api/auth/instant-login", {
+      const res = await fetch("/api/auth/demo-login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: demoEmail }),
       });
 
-      // 2. Also attempt Supabase sign-in if available
-      try {
-        await supabase.auth.signInAnonymously();
-      } catch (e) {
-        // Fallback gracefully to instant session
+      if (!res.ok) {
+        throw new Error("Unable to initialize demo session");
       }
 
       router.push("/dashboard");
       router.refresh();
-    } catch (err: any) {
-      setErrorMsg("Failed to start session. Please try again.");
+    } catch {
+      setErrorMsg("Failed to start demo session. Please try again.");
       setLoading(false);
     }
   }
 
-  // Password-Free Email Access
+  // Instant Email Login
   async function handleEmailContinue(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) {
       setErrorMsg("Please enter an email address.");
       return;
     }
-    await handleInstantAccess(email.trim());
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      await fetch("/api/auth/instant-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setErrorMsg("Unable to sign in. Please try again.");
+      setLoading(false);
+    }
   }
 
   // Optional traditional password login
@@ -80,7 +86,7 @@ export default function LoginPage() {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (err: any) {
+    } catch {
       setErrorMsg("Unable to connect with password. Use 1-Click Instant Access instead.");
       setLoading(false);
     }
@@ -94,7 +100,7 @@ export default function LoginPage() {
           Welcome to CampaignPulse
         </h2>
         <p className="mt-2 text-sm text-[#4B5563]">
-          Fast, password-free access for small-business owners and judges
+          Fast, password-free access for small-business owners
         </p>
       </div>
 
@@ -110,18 +116,18 @@ export default function LoginPage() {
           {/* Primary Action: 1-Click Instant Demo Access */}
           <div className="p-5 rounded-2xl bg-[#0E7C86]/10 border border-[#0E7C86]/25 text-center space-y-3">
             <span className="inline-block px-3 py-1 rounded-full bg-[#0E7C86] text-white text-xs font-bold uppercase tracking-wider">
-              Recommended &bull; No Password Required
+              Explore Live Demo &bull; No Password Required
             </span>
             <h3 className="text-base font-bold text-[#1F2937]">
-              Instant Access (Demo &amp; Judge Mode)
+              Try CampaignPulse Live
             </h3>
             <p className="text-xs text-[#4B5563] leading-relaxed">
-              Click below to jump directly into the dashboard with our pre-configured demo account (<strong className="text-[#1F2937]">support@outskill.com</strong>).
+              Click below to jump directly into the full dashboard with sample campaigns and AI generators pre-loaded.
             </p>
             <button
               type="button"
               disabled={loading}
-              onClick={() => handleInstantAccess("support@outskill.com")}
+              onClick={handleDemoAccess}
               className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-[#0E7C86] hover:bg-[#0a5f67] shadow-md shadow-[#0E7C86]/25 transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
@@ -129,7 +135,7 @@ export default function LoginPage() {
               ) : (
                 <>
                   <span>🚀</span>
-                  <span>Enter With 1-Click (No Password)</span>
+                  <span>Enter Live Demo</span>
                 </>
               )}
             </button>

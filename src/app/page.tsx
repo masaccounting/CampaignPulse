@@ -17,7 +17,7 @@ export default function Home() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0E7C86]/10 border border-[#0E7C86]/20 text-[#0E7C86] text-xs sm:text-sm font-semibold mb-6">
             <span className="w-2 h-2 rounded-full bg-[#FF6B5B] animate-pulse"></span>
-            Built for Small Business Owners &bull; Outskill AI Accelerator
+            Built for Small Business Owners
           </div>
 
           {/* Main Headline */}
@@ -50,23 +50,20 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Judge Demo Quick Access Banner */}
+          {/* Demo Quick Access Banner */}
           <div className="inline-block bg-white border border-[#F3E8E2] rounded-2xl p-4 shadow-sm text-left max-w-md mx-auto">
             <div className="flex items-center gap-3">
-              <span className="px-2.5 py-1 rounded-lg bg-[#FF6B5B]/15 text-[#FF6B5B] text-xs font-bold uppercase tracking-wider">
-                Judge Access
+              <span className="px-2.5 py-1 rounded-lg bg-[#0E7C86]/15 text-[#0E7C86] text-xs font-bold uppercase tracking-wider">
+                Live Demo
               </span>
               <p className="text-xs text-[#4B5563]">
-                Testing the live site? Use instant demo account{" "}
-                <strong className="text-[#1F2937]">support@outskill.com</strong>{" "}
-                or{" "}
+                Want to test before signing up?{" "}
                 <Link
                   href="/auth/login"
                   className="text-[#0E7C86] font-semibold underline underline-offset-2"
                 >
-                  Click here to log in
+                  Try the interactive demo (no password required) &rarr;
                 </Link>
-                .
               </p>
             </div>
           </div>
@@ -80,14 +77,14 @@ export default function Home() {
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
               Three Simple Steps
-            </h2>
-            <h3 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
+            </p>
+            <h2 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
               From Idea to Published Campaign
-            </h3>
+            </h2>
             <p className="text-base text-[#4B5563] mt-3">
-              No marketing degree required. Just answer four quick question groups and let our AI handle the planning.
+              No marketing degree required. Just answer a few quick questions and let our AI handle the planning.
             </p>
           </div>
 
@@ -98,9 +95,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl bg-[#0E7C86] text-white flex items-center justify-center font-extrabold text-lg mb-6 shadow-md shadow-[#0E7C86]/20">
                   1
                 </div>
-                <h4 className="text-xl font-bold text-[#1F2937] mb-3">
+                <h3 className="text-xl font-bold text-[#1F2937] mb-3">
                   Share Your Business Brief
-                </h4>
+                </h3>
                 <p className="text-sm text-[#4B5563] leading-relaxed">
                   Enter your business name, what you sell, your audience, goal, and how many weeks you want to run. Or click &ldquo;Try an example&rdquo; to test with one click.
                 </p>
@@ -116,9 +113,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl bg-[#FF6B5B] text-white flex items-center justify-center font-extrabold text-lg mb-6 shadow-md shadow-[#FF6B5B]/20">
                   2
                 </div>
-                <h4 className="text-xl font-bold text-[#1F2937] mb-3">
+                <h3 className="text-xl font-bold text-[#1F2937] mb-3">
                   AI Builds Your Dated Calendar
-                </h4>
+                </h3>
                 <p className="text-sm text-[#4B5563] leading-relaxed">
                   Google Gemini calculates your posting cadence, assigns channels (Instagram, Facebook, Email, Ads), and crafts tailored titles and ideas for every single date.
                 </p>
@@ -134,9 +131,9 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl bg-[#0E7C86] text-white flex items-center justify-center font-extrabold text-lg mb-6 shadow-md shadow-[#0E7C86]/20">
                   3
                 </div>
-                <h4 className="text-xl font-bold text-[#1F2937] mb-3">
+                <h3 className="text-xl font-bold text-[#1F2937] mb-3">
                   Edit &amp; Generate Ready-to-Post Copy
-                </h4>
+                </h3>
                 <p className="text-sm text-[#4B5563] leading-relaxed">
                   Click any post on your calendar to instantly write 3 content ideas, 15/30/60-second video ad scripts, email copy, and full creative briefs.
                 </p>
@@ -153,12 +150,12 @@ export default function Home() {
       <section id="sample-calendar" className="py-20 bg-[#FFF9F5]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
               See It In Action
-            </h2>
-            <h3 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
+            </p>
+            <h2 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
               Sample 4-Week Campaign Calendar
-            </h3>
+            </h2>
             <p className="text-base text-[#4B5563] mt-2">
               Here is what an AI-generated calendar looks like for a neighborhood artisan bakery.
             </p>
@@ -172,12 +169,12 @@ export default function Home() {
       <section id="features" className="py-20 bg-white border-t border-[#F3E8E2]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
               Tailored for Small Businesses
-            </h2>
-            <h3 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
+            </p>
+            <h2 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
               Everything You Need to Run Professional Campaigns
-            </h3>
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -185,9 +182,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-xl bg-[#0E7C86]/10 text-[#0E7C86] flex items-center justify-center font-bold mb-4">
                 📅
               </div>
-              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+              <h3 className="font-bold text-base text-[#1F2937] mb-2">
                 Month, Week &amp; List Views
-              </h4>
+              </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed">
                 Color-coded by channel. Click to edit, drag items to new dates, or add and duplicate posts with one click.
               </p>
@@ -197,9 +194,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-xl bg-[#FF6B5B]/10 text-[#FF6B5B] flex items-center justify-center font-bold mb-4">
                 ✍️
               </div>
-              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+              <h3 className="font-bold text-base text-[#1F2937] mb-2">
                 Built-in AI Copywriter
-              </h4>
+              </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed">
                 Generate 3 content ideas, ad scripts with visual cues, email subject lines, and social captions with hashtags.
               </p>
@@ -209,9 +206,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-xl bg-[#0E7C86]/10 text-[#0E7C86] flex items-center justify-center font-bold mb-4">
                 📋
               </div>
-              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+              <h3 className="font-bold text-base text-[#1F2937] mb-2">
                 Brand Profile Reuse
-              </h4>
+              </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed">
                 Save your business brief and brand voice once. Reuse it effortlessly whenever you launch a new seasonal campaign.
               </p>
@@ -221,9 +218,9 @@ export default function Home() {
               <div className="w-10 h-10 rounded-xl bg-[#FF6B5B]/10 text-[#FF6B5B] flex items-center justify-center font-bold mb-4">
                 📤
               </div>
-              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+              <h3 className="font-bold text-base text-[#1F2937] mb-2">
                 Export to CSV &amp; PDF
-              </h4>
+              </h3>
               <p className="text-xs text-[#4B5563] leading-relaxed">
                 Download your completed campaign as an Excel/Google Sheets CSV or save a print-friendly visual PDF to share with your team.
               </p>

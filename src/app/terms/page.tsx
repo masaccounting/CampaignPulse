@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Read the terms and conditions for using CampaignPulse.",
+};
 
 export default function TermsPage() {
   return (
@@ -9,14 +15,18 @@ export default function TermsPage() {
         <div className="bg-white rounded-3xl border border-[#F3E8E2] p-8 sm:p-12 shadow-sm space-y-6">
           <div className="border-b border-[#F3E8E2] pb-6">
             <span className="text-xs font-bold uppercase tracking-wider text-[#0E7C86]">
-              Legal &bull; Placeholder Draft
+              Legal
             </span>
             <h1 className="text-3xl font-extrabold text-[#1F2937] mt-1">
               Terms of Service
             </h1>
             <p className="text-xs text-[#6B7280] mt-1">
-              Last Updated: October 31, 2026 &bull; Outskill Hackathon Demonstration
+              Last Updated: October 31, 2026
             </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2] text-xs text-[#6B7280]">
+            <em>Notice: This policy is a draft and will be finalised before public launch. (TODO: Supply final legal terms text).</em>
           </div>
 
           <div className="space-y-4 text-sm text-[#4B5563] leading-relaxed">
@@ -35,9 +45,6 @@ export default function TermsPage() {
             <p>
               You agree not to use CampaignPulse to generate deceptive advertising, unlawful marketing material, spam, or misleading claims.
             </p>
-            <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2] text-xs text-[#6B7280]">
-              <em>Note for judges &amp; team: This is a demonstration terms agreement created for the Outskill AI Accelerator hackathon. Full commercial terms should be implemented prior to customer billing.</em>
-            </div>
           </div>
         </div>
       </main>
@@ -45,4 +52,3 @@ export default function TermsPage() {
     </div>
   );
 }
-

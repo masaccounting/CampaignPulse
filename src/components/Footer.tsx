@@ -12,54 +12,56 @@ export default function Footer() {
             <p className="text-sm text-[#4B5563] max-w-sm">
               The AI campaign planner designed specifically for small-business owners. Turn simple details into an actionable, ready-to-publish marketing calendar in minutes.
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFF9F5] border border-[#F3E8E2] text-xs font-medium text-[#0E7C86]">
-              <span className="w-2 h-2 rounded-full bg-[#0E7C86]"></span>
-              Outskill AI Accelerator Hackathon Project
-            </div>
+            {process.env.NEXT_PUBLIC_SHOW_JUDGE_MODE === "true" && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFF9F5] border border-[#F3E8E2] text-xs font-medium text-[#0E7C86]">
+                <span className="w-2 h-2 rounded-full bg-[#0E7C86]"></span>
+                Outskill AI Accelerator Hackathon Project
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1F2937] mb-3">
+          <nav aria-label="Product Links">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#1F2937] mb-3">
               Product
-            </h3>
+            </p>
             <ul className="space-y-2.5 text-sm text-[#4B5563]">
               <li>
-                <Link href="/#how-it-works" className="hover:text-[#0E7C86]">
+                <Link href="/#how-it-works" className="hover:text-[#0E7C86] min-h-[44px] inline-flex items-center">
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/#sample-calendar" className="hover:text-[#0E7C86]">
+                <Link href="/#sample-calendar" className="hover:text-[#0E7C86] min-h-[44px] inline-flex items-center">
                   Sample Calendar
                 </Link>
               </li>
               <li>
-                <Link href="/#features" className="hover:text-[#0E7C86]">
+                <Link href="/#features" className="hover:text-[#0E7C86] min-h-[44px] inline-flex items-center">
                   Features &amp; Tools
                 </Link>
               </li>
               <li>
-                <Link href="/auth/signup" className="hover:text-[#0E7C86]">
+                <Link href="/auth/signup" className="hover:text-[#0E7C86] min-h-[44px] inline-flex items-center">
                   Create Free Account
                 </Link>
               </li>
             </ul>
-          </div>
+          </nav>
 
           {/* Legal & Trust */}
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#1F2937] mb-3">
+          <nav aria-label="Legal and Trust Links">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#1F2937] mb-3">
               Trust &amp; Legal
-            </h3>
+            </p>
             <ul className="space-y-2.5 text-sm text-[#4B5563]">
               <li>
-                <Link href="/privacy" className="hover:text-[#0E7C86]">
+                <Link href="/privacy" className="hover:text-[#0E7C86] min-h-[44px] inline-flex items-center">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-[#0E7C86]">
+                <Link href="/terms" className="hover:text-[#0E7C86] min-h-[44px] inline-flex items-center">
                   Terms of Service
                 </Link>
               </li>
@@ -69,11 +71,11 @@ export default function Footer() {
                 </span>
               </li>
             </ul>
-          </div>
+          </nav>
         </div>
 
-        <div className="pt-8 border-t border-[#F3E8E2] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#6B7280]">
-          <p>&copy; {new Date().getFullYear()} CampaignPulse. Built with care for small businesses.</p>
+        <div className="pt-8 border-t border-[#F3E8E2] flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#4B5563]">
+          <p>&copy; 2026 CampaignPulse. Built with care for small businesses.</p>
           <p>Powered by Next.js, Supabase &amp; Google Gemini AI.</p>
         </div>
       </div>
