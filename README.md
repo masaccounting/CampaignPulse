@@ -1,3 +1,3 @@
-# Hackathon Team 53
+# CampaignPulse
 
-Welcome to Hackathon Team 53!
+Welcome to CampaignPulse!
