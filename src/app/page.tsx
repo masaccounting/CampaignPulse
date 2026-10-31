@@ -1,126 +1,258 @@
+import Link from "next/link";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SampleCalendarPreview from "@/components/SampleCalendarPreview";
+
 export default function Home() {
-  const services = [
-    {
-      name: "GitHub Repository",
-      status: "Connected & Verified",
-      detail: "masaccounting/CampaignPulse (main)",
-      icon: (
-        <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
-          <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Vercel Edge Platform",
-      status: "Continuous Deployment Active",
-      detail: "Automated production builds on push",
-      icon: (
-        <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 2L2 19.7778H22L12 2Z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Supabase Database & Auth",
-      status: "Credentials & Auth Active",
-      detail: "Postgres + SSR Token Refreshing",
-      icon: (
-        <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M11.996 0L1.758 13.917h8.243v10.083l10.239-13.917h-8.244V0z" />
-        </svg>
-      ),
-    },
-    {
-      name: "Google Gemini AI API",
-      status: "Verified & Operational",
-      detail: "50+ Models accessible for intelligence",
-      icon: (
-        <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 flex flex-col justify-between p-6 sm:p-12">
-      <div className="max-w-4xl mx-auto w-full pt-8 pb-12 flex-1 flex flex-col justify-center">
-        {/* Top Status Pill */}
-        <div className="flex items-center gap-2 self-start bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide mb-8 backdrop-blur-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          Deployment Pipeline Verified &amp; Active
-        </div>
+    <div className="min-h-screen flex flex-col bg-[#FFF9F5] text-[#1F2937]">
+      <Navbar />
 
-        {/* Hero Title & Subtitle */}
-        <div className="space-y-4 mb-12">
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-            CampaignPulse
+      {/* Hero Section */}
+      <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden">
+        {/* Subtle decorative background gradient */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-[#0E7C86]/5 to-transparent pointer-events-none rounded-full blur-3xl -z-10" />
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0E7C86]/10 border border-[#0E7C86]/20 text-[#0E7C86] text-xs sm:text-sm font-semibold mb-6">
+            <span className="w-2 h-2 rounded-full bg-[#FF6B5B] animate-pulse"></span>
+            Built for Small Business Owners &bull; Outskill AI Accelerator
+          </div>
+
+          {/* Main Headline */}
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#1F2937] leading-[1.15] mb-6">
+            Your Marketing Calendar,{" "}
+            <span className="text-[#0E7C86]">Planned &amp; Written</span> by AI
+            in Minutes.
           </h1>
-          <p className="text-lg sm:text-xl text-slate-400 max-w-2xl font-normal leading-relaxed">
-            Real-time political and marketing campaign intelligence. All core services, APIs, and automated continuous deployment workflows are connected and fully functional.
-          </p>
-        </div>
 
-        {/* Grid of Verified Services */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
-          {services.map((svc) => (
-            <div
-              key={svc.name}
-              className="bg-slate-900/60 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-5 backdrop-blur-sm transition-all duration-200 hover:shadow-lg hover:shadow-emerald-950/20"
+          {/* Subtitle */}
+          <p className="text-lg sm:text-xl text-[#4B5563] max-w-3xl mx-auto font-normal leading-relaxed mb-10">
+            Never wonder what to post again. Turn a few simple details about your
+            business and goals into an editable, ready-to-execute campaign calendar
+            with tailored social copy, ad scripts, and creative direction.
+          </p>
+
+          {/* Call to Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <Link
+              href="/auth/signup"
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-base text-white bg-[#0E7C86] hover:bg-[#0a5f67] shadow-lg shadow-[#0E7C86]/25 hover:shadow-xl transition-all"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/50">
-                  {svc.icon}
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-950/50 border border-emerald-500/20 px-2.5 py-1 rounded-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  {svc.status}
-                </span>
-              </div>
-              <h2 className="text-base font-semibold text-slate-200 mb-1">
-                {svc.name}
-              </h2>
-              <p className="text-xs text-slate-400 font-mono">
-                {svc.detail}
+              Start Free Campaign &rarr;
+            </Link>
+            <Link
+              href="/#sample-calendar"
+              className="w-full sm:w-auto px-7 py-4 rounded-2xl font-semibold text-base text-[#1F2937] bg-white border border-[#F3E8E2] hover:bg-[#F3E8E2] transition-all"
+            >
+              See Sample Calendar
+            </Link>
+          </div>
+
+          {/* Judge Demo Quick Access Banner */}
+          <div className="inline-block bg-white border border-[#F3E8E2] rounded-2xl p-4 shadow-sm text-left max-w-md mx-auto">
+            <div className="flex items-center gap-3">
+              <span className="px-2.5 py-1 rounded-lg bg-[#FF6B5B]/15 text-[#FF6B5B] text-xs font-bold uppercase tracking-wider">
+                Judge Access
+              </span>
+              <p className="text-xs text-[#4B5563]">
+                Testing the live site? Use instant demo account{" "}
+                <strong className="text-[#1F2937]">support@outskill.com</strong>{" "}
+                or{" "}
+                <Link
+                  href="/auth/login"
+                  className="text-[#0E7C86] font-semibold underline underline-offset-2"
+                >
+                  Click here to log in
+                </Link>
+                .
               </p>
             </div>
-          ))}
+          </div>
         </div>
+      </section>
 
-        {/* Next Steps / Status Box */}
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-sm">
-          <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">
-            System Diagnostics
-          </h3>
-          <ul className="space-y-2 text-xs text-slate-400">
-            <li className="flex items-center gap-2">
-              <span className="text-emerald-400">&#10003;</span>
-              <span>Next.js 16 App Router &amp; TypeScript compiled cleanly via Turbopack.</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-emerald-400">&#10003;</span>
-              <span>Supabase SSR Session Middleware configured for automatic token refresh.</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-emerald-400">&#10003;</span>
-              <span>Google Gemini API connection tested and verified.</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span className="text-emerald-400">&#10003;</span>
-              <span>GitHub remote tracking synchronized with automatic Vercel deployment webhook.</span>
-            </li>
-          </ul>
+      {/* Three-Step 'How It Works' Section */}
+      <section
+        id="how-it-works"
+        className="py-20 bg-white border-y border-[#F3E8E2]"
+      >
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
+              Three Simple Steps
+            </h2>
+            <h3 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
+              From Idea to Published Campaign
+            </h3>
+            <p className="text-base text-[#4B5563] mt-3">
+              No marketing degree required. Just answer four quick question groups and let our AI handle the planning.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <div className="relative bg-[#FFF9F5] rounded-3xl border border-[#F3E8E2] p-8 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#0E7C86] text-white flex items-center justify-center font-extrabold text-lg mb-6 shadow-md shadow-[#0E7C86]/20">
+                  1
+                </div>
+                <h4 className="text-xl font-bold text-[#1F2937] mb-3">
+                  Share Your Business Brief
+                </h4>
+                <p className="text-sm text-[#4B5563] leading-relaxed">
+                  Enter your business name, what you sell, your audience, goal, and how many weeks you want to run. Or click &ldquo;Try an example&rdquo; to test with one click.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-[#F3E8E2] text-xs font-semibold text-[#0E7C86]">
+                &bull; Saves to your Brand Profile
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative bg-[#FFF9F5] rounded-3xl border border-[#F3E8E2] p-8 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#FF6B5B] text-white flex items-center justify-center font-extrabold text-lg mb-6 shadow-md shadow-[#FF6B5B]/20">
+                  2
+                </div>
+                <h4 className="text-xl font-bold text-[#1F2937] mb-3">
+                  AI Builds Your Dated Calendar
+                </h4>
+                <p className="text-sm text-[#4B5563] leading-relaxed">
+                  Google Gemini calculates your posting cadence, assigns channels (Instagram, Facebook, Email, Ads), and crafts tailored titles and ideas for every single date.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-[#F3E8E2] text-xs font-semibold text-[#FF6B5B]">
+                &bull; Includes seasonal &amp; holiday moments
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative bg-[#FFF9F5] rounded-3xl border border-[#F3E8E2] p-8 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-[#0E7C86] text-white flex items-center justify-center font-extrabold text-lg mb-6 shadow-md shadow-[#0E7C86]/20">
+                  3
+                </div>
+                <h4 className="text-xl font-bold text-[#1F2937] mb-3">
+                  Edit &amp; Generate Ready-to-Post Copy
+                </h4>
+                <p className="text-sm text-[#4B5563] leading-relaxed">
+                  Click any post on your calendar to instantly write 3 content ideas, 15/30/60-second video ad scripts, email copy, and full creative briefs.
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-[#F3E8E2] text-xs font-semibold text-[#0E7C86]">
+                &bull; Export to CSV or print as PDF
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="max-w-4xl mx-auto w-full pt-8 border-t border-slate-800/60 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <span>&copy; 2026 CampaignPulse. All rights reserved.</span>
-        <span>Environment: Production Ready</span>
-      </footer>
-    </main>
+      {/* Sample Calendar Preview Section */}
+      <section id="sample-calendar" className="py-20 bg-[#FFF9F5]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
+              See It In Action
+            </h2>
+            <h3 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
+              Sample 4-Week Campaign Calendar
+            </h3>
+            <p className="text-base text-[#4B5563] mt-2">
+              Here is what an AI-generated calendar looks like for a neighborhood artisan bakery.
+            </p>
+          </div>
+
+          <SampleCalendarPreview />
+        </div>
+      </section>
+
+      {/* Core Features & Value Pillars */}
+      <section id="features" className="py-20 bg-white border-t border-[#F3E8E2]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#0E7C86] mb-2">
+              Tailored for Small Businesses
+            </h2>
+            <h3 className="text-3xl font-extrabold text-[#1F2937] tracking-tight">
+              Everything You Need to Run Professional Campaigns
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="p-6 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2]">
+              <div className="w-10 h-10 rounded-xl bg-[#0E7C86]/10 text-[#0E7C86] flex items-center justify-center font-bold mb-4">
+                📅
+              </div>
+              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+                Month, Week &amp; List Views
+              </h4>
+              <p className="text-xs text-[#4B5563] leading-relaxed">
+                Color-coded by channel. Click to edit, drag items to new dates, or add and duplicate posts with one click.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2]">
+              <div className="w-10 h-10 rounded-xl bg-[#FF6B5B]/10 text-[#FF6B5B] flex items-center justify-center font-bold mb-4">
+                ✍️
+              </div>
+              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+                Built-in AI Copywriter
+              </h4>
+              <p className="text-xs text-[#4B5563] leading-relaxed">
+                Generate 3 content ideas, ad scripts with visual cues, email subject lines, and social captions with hashtags.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2]">
+              <div className="w-10 h-10 rounded-xl bg-[#0E7C86]/10 text-[#0E7C86] flex items-center justify-center font-bold mb-4">
+                📋
+              </div>
+              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+                Brand Profile Reuse
+              </h4>
+              <p className="text-xs text-[#4B5563] leading-relaxed">
+                Save your business brief and brand voice once. Reuse it effortlessly whenever you launch a new seasonal campaign.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2]">
+              <div className="w-10 h-10 rounded-xl bg-[#FF6B5B]/10 text-[#FF6B5B] flex items-center justify-center font-bold mb-4">
+                📤
+              </div>
+              <h4 className="font-bold text-base text-[#1F2937] mb-2">
+                Export to CSV &amp; PDF
+              </h4>
+              <p className="text-xs text-[#4B5563] leading-relaxed">
+                Download your completed campaign as an Excel/Google Sheets CSV or save a print-friendly visual PDF to share with your team.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Banner */}
+      <section className="py-20 bg-gradient-to-br from-[#0E7C86] to-[#0a5f67] text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            Ready to Take the Stress Out of Marketing?
+          </h2>
+          <p className="text-base sm:text-lg text-emerald-50 max-w-2xl mx-auto leading-relaxed">
+            Create your free account today and generate your first full marketing campaign calendar in less than five minutes.
+          </p>
+          <div className="pt-4">
+            <Link
+              href="/auth/signup"
+              className="inline-block px-8 py-4 rounded-2xl font-bold text-base text-[#0E7C86] bg-white hover:bg-emerald-50 shadow-xl transition-all"
+            >
+              Get Started Free &mdash; No Credit Card Required
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
   );
 }
