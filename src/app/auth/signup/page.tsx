@@ -242,7 +242,7 @@ export default function SignUpPage() {
                   ? "Setting up..."
                   : usePassword
                   ? "Create Account with Password"
-                  : "Start Free &mdash; Instant Access"}
+                  : "Start Free — Instant Access"}
               </button>
             </form>
           )}
