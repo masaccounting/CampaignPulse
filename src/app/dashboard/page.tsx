@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,29 +8,42 @@ import Footer from "@/components/Footer";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const guestSession = cookieStore.get("cp_guest_session")?.value;
+  const guestEmail = cookieStore.get("cp_guest_email")?.value;
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (!user && !guestSession) {
     redirect("/auth/login");
   }
 
-  // Fetch user profile and existing campaigns
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const effectiveEmail = user?.email || guestEmail || "support@outskill.com";
 
-  const { data: campaigns } = await supabase
-    .from("campaigns")
-    .select("*, calendar_items(count)")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  // Fetch user profile and existing campaigns if Supabase user exists
+  let profile: any = null;
+  let campaigns: any[] = [];
 
-  const businessName = profile?.business_name || "My Business";
+  if (user) {
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+    profile = p;
+
+    const { data: c } = await supabase
+      .from("campaigns")
+      .select("*, calendar_items(count)")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    campaigns = c || [];
+  }
+
+  const businessName = profile?.business_name || (guestSession ? "Outskill Demonstration Business" : "My Business");
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFF9F5] text-[#1F2937]">
@@ -49,7 +63,7 @@ export default async function DashboardPage() {
               {businessName}
             </h1>
             <p className="text-xs text-[#6B7280] mt-0.5">
-              Signed in as <strong className="text-[#4B5563]">{user.email}</strong>
+              Signed in as <strong className="text-[#4B5563]">{effectiveEmail}</strong>
             </p>
           </div>
 

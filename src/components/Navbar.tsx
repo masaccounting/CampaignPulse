@@ -16,14 +16,24 @@ export default function Navbar() {
   useEffect(() => {
     async function checkUser() {
       const { data } = await supabase.auth.getUser();
-      setUser(data.user);
+      if (data.user) {
+        setUser(data.user);
+      } else {
+        // Check for guest cookie
+        const hasGuest = document.cookie.includes("cp_guest_session=active");
+        if (hasGuest) {
+          setUser({ email: "Guest User" });
+        }
+      }
       setLoading(false);
     }
     checkUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user ?? null);
+        if (session?.user) {
+          setUser(session.user);
+        }
       }
     );
 
@@ -33,7 +43,8 @@ export default function Navbar() {
   }, []);
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut().catch(() => {});
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     setUser(null);
     router.push("/");
     router.refresh();

@@ -36,13 +36,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Check for either Supabase user or 1-click password-free guest session
+  const guestSession = request.cookies.get('cp_guest_session')?.value
+  const isAuthenticated = Boolean(user || guestSession)
+
   // Protected route enforcement: redirect unauthenticated users to login
   const protectedPrefixes = ['/dashboard', '/wizard', '/calendar', '/brand-profile']
   const isProtectedPath = protectedPrefixes.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   )
 
-  if (isProtectedPath && !user) {
+  if (isProtectedPath && !isAuthenticated) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/auth/login'
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
@@ -54,7 +58,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthPage = authPrefixes.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   )
-  if (isAuthPage && user) {
+  if (isAuthPage && isAuthenticated) {
     const dashboardUrl = request.nextUrl.clone()
     dashboardUrl.pathname = '/dashboard'
     return NextResponse.redirect(dashboardUrl)

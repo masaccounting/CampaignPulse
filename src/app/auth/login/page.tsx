@@ -9,12 +9,51 @@ import { createClient } from "@/utils/supabase/client";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
-  async function handleLogin(e: React.FormEvent) {
+  // Instant 1-Click Access (No Password Required)
+  async function handleInstantAccess(demoEmail = "support@outskill.com") {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      // 1. Set server cookie session
+      await fetch("/api/auth/instant-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: demoEmail }),
+      });
+
+      // 2. Also attempt Supabase sign-in if available
+      try {
+        await supabase.auth.signInAnonymously();
+      } catch (e) {
+        // Fallback gracefully to instant session
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch (err: any) {
+      setErrorMsg("Failed to start session. Please try again.");
+      setLoading(false);
+    }
+  }
+
+  // Password-Free Email Access
+  async function handleEmailContinue(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) {
+      setErrorMsg("Please enter an email address.");
+      return;
+    }
+    await handleInstantAccess(email.trim());
+  }
+
+  // Optional traditional password login
+  async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault();
     setErrorMsg(null);
     setLoading(true);
@@ -32,18 +71,19 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        // Also set cookie session
+        await fetch("/api/auth/instant-login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.user.email }),
+        });
         router.push("/dashboard");
         router.refresh();
       }
     } catch (err: any) {
-      setErrorMsg("An unexpected error occurred. Please try again.");
+      setErrorMsg("Unable to connect with password. Use 1-Click Instant Access instead.");
       setLoading(false);
     }
-  }
-
-  function prefillJudgeDemo() {
-    setEmail("support@outskill.com");
-    setPassword("Outskill2026!");
   }
 
   return (
@@ -51,54 +91,71 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Logo size="lg" className="justify-center mb-6" />
         <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1F2937]">
-          Welcome back
+          Welcome to CampaignPulse
         </h2>
         <p className="mt-2 text-sm text-[#4B5563]">
-          Log in to manage and view your marketing campaigns
+          Fast, password-free access for small-business owners and judges
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-10 shadow-xl shadow-[#0E7C86]/5 rounded-3xl border border-[#F3E8E2]">
-          {/* Judge / Hackathon Quick Demo Box */}
-          <div className="mb-6 p-4 rounded-2xl bg-[#0E7C86]/10 border border-[#0E7C86]/20">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#0E7C86]">
-                🎓 Outskill Judge Demo
-              </span>
-              <button
-                type="button"
-                onClick={prefillJudgeDemo}
-                className="text-xs font-semibold text-[#0E7C86] underline hover:opacity-80"
-              >
-                Auto-fill demo credentials
-              </button>
-            </div>
-            <p className="text-xs text-[#4B5563] mt-1.5 leading-relaxed">
-              Judges can click <strong>&ldquo;Auto-fill demo credentials&rdquo;</strong> to test with our confirmed demonstration account.
-            </p>
-          </div>
-
+        <div className="bg-white py-8 px-6 sm:px-10 shadow-xl shadow-[#0E7C86]/5 rounded-3xl border border-[#F3E8E2] space-y-6">
           {errorMsg && (
-            <div className="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
-              <span className="font-bold">Error: </span>
+            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800">
+              <span className="font-bold">Notice: </span>
               {errorMsg}
             </div>
           )}
 
-          <form className="space-y-5" onSubmit={handleLogin}>
+          {/* Primary Action: 1-Click Instant Demo Access */}
+          <div className="p-5 rounded-2xl bg-[#0E7C86]/10 border border-[#0E7C86]/25 text-center space-y-3">
+            <span className="inline-block px-3 py-1 rounded-full bg-[#0E7C86] text-white text-xs font-bold uppercase tracking-wider">
+              Recommended &bull; No Password Required
+            </span>
+            <h3 className="text-base font-bold text-[#1F2937]">
+              Instant Access (Demo &amp; Judge Mode)
+            </h3>
+            <p className="text-xs text-[#4B5563] leading-relaxed">
+              Click below to jump directly into the dashboard with our pre-configured demo account (<strong className="text-[#1F2937]">support@outskill.com</strong>).
+            </p>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleInstantAccess("support@outskill.com")}
+              className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm text-white bg-[#0E7C86] hover:bg-[#0a5f67] shadow-md shadow-[#0E7C86]/25 transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <span>Entering app...</span>
+              ) : (
+                <>
+                  <span>🚀</span>
+                  <span>Enter With 1-Click (No Password)</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-[#F3E8E2] w-full"></div>
+            <span className="bg-white px-3 text-xs text-[#9CA3AF] uppercase font-semibold">
+              Or your email
+            </span>
+            <div className="border-t border-[#F3E8E2] w-full"></div>
+          </div>
+
+          {/* Password-Free Email Sign-In */}
+          <form onSubmit={handleEmailContinue} className="space-y-4">
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-[#1F2937] mb-1.5"
+                className="block text-xs font-bold uppercase tracking-wider text-[#1F2937] mb-1.5"
               >
-                Email Address
+                Enter Your Email Address
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -107,65 +164,51 @@ export default function LoginPage() {
               />
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-semibold text-[#1F2937]"
-                >
-                  Password
-                </label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-xs font-medium text-[#0E7C86] hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border border-[#D1D5DB] focus:border-[#0E7C86] focus:ring-2 focus:ring-[#0E7C86]/20 text-sm text-[#1F2937] placeholder:text-[#9CA3AF] bg-[#FFF9F5]/40"
-              />
-            </div>
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-[#0E7C86] hover:bg-[#0a5f67] shadow-md shadow-[#0E7C86]/25 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded-xl font-bold text-sm text-[#1F2937] bg-white border border-[#D1D5DB] hover:bg-[#F3E8E2] transition-all"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Logging in...
-                </>
-              ) : (
-                "Log In"
-              )}
+              Continue With This Email &rarr;
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-[#4B5563]">
-            Don&apos;t have an account yet?{" "}
-            <Link
-              href="/auth/signup"
-              className="font-bold text-[#0E7C86] hover:underline"
+          {/* Optional Password Accordion */}
+          <div className="pt-2 text-center">
+            <button
+              type="button"
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="text-xs text-[#6B7280] hover:text-[#0E7C86] underline"
             >
-              Sign up for free
-            </Link>
+              {showPasswordForm ? "Hide password field" : "Have a Supabase password? Click to expand"}
+            </button>
+
+            {showPasswordForm && (
+              <form onSubmit={handlePasswordLogin} className="mt-4 pt-4 border-t border-[#F3E8E2] space-y-3 text-left">
+                <div>
+                  <label className="block text-xs font-semibold text-[#1F2937] mb-1">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#D1D5DB] text-sm text-[#1F2937] bg-[#FFF9F5]/40"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2.5 rounded-xl font-semibold text-xs text-white bg-[#4B5563] hover:bg-[#374151]"
+                >
+                  Log In With Password
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-
