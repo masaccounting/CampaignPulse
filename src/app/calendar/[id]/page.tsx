@@ -297,16 +297,19 @@ export default function CalendarPage() {
           title: selectedItem.title,
           ideaSummary: selectedItem.idea_summary,
           tone: campaign?.brand_tone || "Friendly",
+          timestamp: Date.now(),
         }),
       });
 
       const data = await res.json();
-      setGeneratedContent((prev: Record<string, string>) => ({
-        ...prev,
-        [type]: data.result,
-      }));
+      if (data.result) {
+        setGeneratedContent((prev: Record<string, string>) => ({
+          ...prev,
+          [type]: data.result,
+        }));
+      }
     } catch (e) {
-      console.error(e);
+      console.error("AI Generation error:", e);
     } finally {
       setAiLoading(false);
     }
@@ -654,8 +657,9 @@ export default function CalendarPage() {
                         {copiedKey === activeTab ? "✓ Copied!" : "📋 Copy to Clipboard"}
                       </button>
                       <button
+                        type="button"
                         onClick={() => generateAITool(activeTab)}
-                        className="text-xs text-[#0E7C86] font-semibold hover:underline"
+                        className="text-xs text-[#0E7C86] font-semibold hover:underline flex items-center gap-1 cursor-pointer min-h-[36px] px-2 rounded-lg hover:bg-[#0E7C86]/10 transition-colors"
                       >
                         🔄 Regenerate
                       </button>

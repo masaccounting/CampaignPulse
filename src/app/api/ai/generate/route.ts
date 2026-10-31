@@ -8,6 +8,7 @@ interface GenerateRequestBody {
   title?: string;
   ideaSummary?: string;
   tone?: string;
+  timestamp?: number;
 }
 
 export async function POST(req: Request) {
@@ -20,8 +21,8 @@ export async function POST(req: Request) {
     // Build the tailored prompt for Gemini
     let promptInstruction = "";
     if (type === "ideas") {
-      promptInstruction = `Generate 3 distinct, creative content angles or ideas for this marketing post.
-Return them as a numbered list (1, 2, 3), each with a bold title and a concise 2-sentence explanation of the hook and visual direction.`;
+      promptInstruction = `Generate 3 distinct, fresh creative content angles or ideas for this marketing post.
+Return them as a numbered list (1, 2, 3), each with an engaging bold title and a 2-sentence explanation of the hook and visual direction.`;
     } else if (type === "script") {
       promptInstruction = `Write two video/audio ad scripts for this post:
 1) A snappy 15-second hook & action script with bracketed [Visual / Audio Cues] and timed markers [0:00 - Hook], [0:05 - Action], [0:10 - CTA].
@@ -52,11 +53,11 @@ ${promptInstruction}
 
 Keep the output polished, clean, realistic, and directly actionable. Avoid fluff or corporate jargon.`;
 
-    // If Gemini API Key is configured, query Google Gemini REST API
+    // Query Google Gemini using the active gemini-3.8-flash model
     if (apiKey) {
       try {
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
           {
             method: "POST",
             headers: {
@@ -73,7 +74,7 @@ Keep the output polished, clean, realistic, and directly actionable. Avoid fluff
                 },
               ],
               generationConfig: {
-                temperature: 0.7,
+                temperature: 0.85,
                 maxOutputTokens: 1024,
               },
             }),
@@ -89,68 +90,123 @@ Keep the output polished, clean, realistic, and directly actionable. Avoid fluff
             return NextResponse.json({ result: generatedText });
           }
         } else {
-          console.error("Gemini API returned error:", await response.text());
+          console.error("Gemini 3.8 Flash returned error:", await response.text());
         }
       } catch (geminiError) {
         console.error("Failed to query Gemini API:", geminiError);
       }
     }
 
-    // High quality fallback generator when API key is unavailable or during network outage
+    // Dynamic variation fallback if Gemini is unreachable
     let fallbackText = "";
     const bName = businessName || "our business";
     const postTitle = title || "Featured Post";
+    const seed = Math.floor(Math.random() * 3);
 
     if (type === "ideas") {
-      fallbackText = `1. The Artisan Craftsmanship Angle
-Capture the morning preparation ritual at ${bName}. Focus on the raw ingredients, high energy, and the passion that goes into every batch.
+      if (seed === 0) {
+        fallbackText = `1. The Early Morning Craft Ritual
+Capture the 5:00 AM preparation at ${bName}. Macro close-ups of pure ingredients, gentle steam rising, and the rhythmic dedication of morning craft.
 
-2. The Customer Transformation Hook
-Share a genuine quote or moment from a regular customer explaining how ${bName} makes their daily routine better or easier.
+2. Behind Every Great Recipe is a Family Story
+Feature the origin of our signature recipe. Explain why our team refuses to cut corners and how that passion reaches your table.
 
-3. The Behind-the-Curtain Secret
-Give viewers an exclusive peek into a technique or ingredient standard that supermarket or big-box competitors never bother to do.`;
+3. The "Taste Test" Customer Moment
+Film real reactions as customers take their first bite at ${bName}. Authentic smiles and candid reviews build instant neighborhood trust.`;
+      } else if (seed === 1) {
+        fallbackText = `1. The 3-Ingredient Simplicity Showcase
+Strip away the noise and highlight pure, wholesome local ingredients. Show side-by-side why natural quality always wins.
+
+2. A Day in the Life of Our Kitchen
+Fast-paced vertical reel showing early morning deliveries, mixing, baking, and the first warm batch hitting the counter.
+
+3. The VIP Secret Drop
+Tease a limited-edition weekend flavor that is only available while daily supplies last. Create healthy FOMO and morning urgency.`;
+      } else {
+        fallbackText = `1. Why We Choose Local Farm Partners
+Spotlight the regional growers who supply our grains and produce. Show how supporting ${bName} directly strengthens our local community.
+
+2. How to Enjoy It at Home (Pro Serving Tips)
+Educate your audience with 3 quick tips to serve, store, or pair this item for the ultimate weekend breakfast experience.
+
+3. Customer Favorite Spotlight
+Dive into the backstory of our #1 best-seller and invite followers to comment their favorite flavor variation.`;
+      }
     } else if (type === "script") {
-      fallbackText = `--- 15-SECOND REEL / HOOK SCRIPT ---
-[0:00 - Hook / Visual]: Quick, fast-paced shot of our craft in motion at ${bName}.
-Voiceover: "Tired of settling for generic options? Here is how we do things differently."
-[0:06 - Body]: Warm lighting, fresh finished product being packaged with care.
-Voiceover: "Handcrafted daily using only the highest quality ingredients."
-[0:11 - Call to Action]: Text overlay showing address or website.
-Voiceover: "Stop by ${bName} or tap the link below to experience the difference."
+      if (seed === 0) {
+        fallbackText = `--- 15-SECOND REEL / HOOK SCRIPT ---
+[0:00 - Hook / Visual]: Fast macro pan across warm artisan texture.
+Voiceover: "Most food on supermarket shelves has been sitting there for weeks. Not here."
+[0:06 - Body]: Flour dusting the prep table as our baker scores the dough.
+Voiceover: "At ${bName}, our ovens fire up at dawn with 100% natural ingredients."
+[0:11 - Call to Action]: Address graphic pops on screen.
+Voiceover: "Visit ${bName} on Elm Street or order ahead online for morning pickup."
 
 --- 30-SECOND COMMERCIAL SCRIPT ---
-[0:00 - Hook]: "Have you ever wondered what makes real neighborhood quality so different?"
-[0:07 - Problem / Relatability]: "Most people settle for mass-produced products that sit on store shelves for weeks without any personality or care."
-[0:16 - Solution / Brand]: "At ${bName}, our morning begins before dawn so that everything you receive is fresh, wholesome, and crafted with genuine pride."
-[0:24 - Offer & Urgency]: "This week, mention this video or order ahead online for a special first-visit treat!"
-[0:28 - Final CTA]: "Visit ${bName} today — we can't wait to welcome you."`;
+[0:00 - Hook]: "Have you ever tasted the difference that real slow fermentation makes?"
+[0:07 - Problem / Relatability]: "Store-bought baked goods are packed with preservatives and dough conditioners that leave you feeling heavy."
+[0:15 - Solution / Brand]: "At ${bName}, we slow-ferment for 24 hours so every single loaf develops a crisp, crackly crust and an airy, digestible crumb."
+[0:22 - Community Offer]: "Stop by this Tuesday through Saturday morning to taste a warm sample slice on us."
+[0:27 - Final CTA]: "Experience real baking again at ${bName}!"`;
+      } else {
+        fallbackText = `--- 15-SECOND REEL / HOOK SCRIPT ---
+[0:00 - Hook / Visual]: Crisp audio of crust crackling as the bread is sliced open.
+Voiceover: "Listen to that sound. That's what real sourdough is supposed to sound like."
+[0:06 - Body]: Baker smiling and placing warm pastries into brown paper bags.
+Voiceover: "Pure flour, water, salt, and 24 hours of artisan patience."
+[0:11 - CTA]: Direct map link overlay.
+Voiceover: "Start your morning right at ${bName}."
+
+--- 30-SECOND COMMERCIAL SCRIPT ---
+[0:00 - Hook]: "What does your ideal morning routine look like?"
+[0:06 - Setting the Scene]: "Freshly ground espresso, morning sunshine, and the irresistible aroma of artisan pastries warm from the oven."
+[0:15 - Craftsmanship]: "Every single item at ${bName} is made by hand with organic heritage grains from local family mills."
+[0:22 - Call to Action]: "Skip the generic drive-thru this week. Treat yourself to real quality crafted right in your neighborhood."
+[0:27 - Sign-off]: "See you tomorrow morning at ${bName}!"`;
+      }
     } else if (type === "copy") {
-      fallbackText = `Real quality has no shortcut. ✨
+      fallbackText = `There is no substitute for authentic craft. 🌿
 
-At ${bName}, we believe that taking extra time and using honest ingredients creates something you can truly taste and feel good about.
+At ${bName}, our morning starts before the sun comes up because we believe you deserve food made with care, honesty, and local ingredients.
 
-Whether you're treating yourself after a long week or sharing something special with the people you love, we're here to make every moment a little brighter.
+Whether you're stopping by on your morning walk or picking up treats for family brunch, we can't wait to share our table with you.
 
-📍 Visit us in store or tap the link in our bio to order ahead for pickup today!
+✨ Fresh batches come out warm at 7:00 AM daily.
+📍 Tap the link in our bio to view today's fresh menu or order ahead!
 
-#${bName.replace(/\s+/g, "")} #ShopSmall #LocalBusiness #QualityFirst #CommunityLove #Handcrafted`;
+#${bName.replace(/\s+/g, "")} #ArtisanBaking #LocalGoodness #MadeWithLove #WeekendRitual #ShopSmall`;
     } else {
-      fallbackText = `CREATIVE BRIEF: ${postTitle.toUpperCase()}
+      if (seed === 0) {
+        fallbackText = `CREATIVE BRIEF: ${postTitle.toUpperCase()}
 
-1. Objective:
-Drive immediate engagement and foot traffic / inquiries for ${bName} by emphasizing authenticity, freshness, and neighborhood charm.
+1. Strategic Objective:
+Drive neighborhood foot traffic and brand warmth by establishing ${bName} as the premier local choice for wholesome quality.
 
 2. Target Audience:
-Local neighbors, busy professionals, and families seeking wholesome, trustworthy products over mass-market convenience.
+Conscious consumers, morning commuters, and food enthusiasts who prioritize craftsmanship and clean ingredients over convenience.
 
-3. Visual & Creative Format:
-High-resolution vertical reel/photo with natural morning lighting, macro focus on textures, and genuine team smiles.
+3. Visual & Aesthetic Tone:
+Warm earth tones, natural daylight, candid behind-the-scenes movement, and macro close-ups highlighting artisan texture.
 
-4. Core Messaging:
-- Uncompromising ingredient and craft standards.
-- Welcoming local atmosphere.
-- Easy direct call-to-action (visit in person or order ahead online).`;
+4. Core Value Proposition:
+- 100% natural, slow-crafted ingredients.
+- Locally owned and deeply rooted in community.
+- Welcoming in-store experience with fast online pickup options.`;
+      } else {
+        fallbackText = `CREATIVE BRIEF: ${postTitle.toUpperCase()} (ENGAGEMENT FOCUS)
+
+1. Strategic Objective:
+Increase social engagement, follower saves, and word-of-mouth recommendations by showing the authentic human team behind ${bName}.
+
+2. Target Audience:
+Local neighborhood foodies, weekend brunch lovers, and loyal regulars who appreciate transparency and culinary craft.
+
+3. Visual Style & Sound:
+Sensory ASMR video, natural baking sounds (kneading, scoring, steam), and genuine smiles from the kitchen team.
+
+4. Call to Action:
+Invite followers to comment their favorite morning ritual or save the post for weekend breakfast planning.`;
+      }
     }
 
     return NextResponse.json({ result: fallbackText });
@@ -162,4 +218,3 @@ High-resolution vertical reel/photo with natural morning lighting, macro focus o
     );
   }
 }
-
