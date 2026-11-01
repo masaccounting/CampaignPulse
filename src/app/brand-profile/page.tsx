@@ -20,22 +20,46 @@ export default function BrandProfilePage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        if (data) {
-          setBusinessName(data.business_name || "");
-          setIndustry(data.industry || "");
-          setWhatYouSell(data.what_you_sell || "");
-          setLocation(data.location || "");
-          setWebsite(data.website || "");
-          setBrandTone(data.brand_tone || "Friendly");
-          setTargetAudience(data.target_audience || "");
+      // 1. Load from localStorage first so saved profiles are visible immediately
+      try {
+        const local = localStorage.getItem("cp_brand_profile");
+        if (local) {
+          const data = JSON.parse(local);
+          if (data.business_name) setBusinessName(data.business_name);
+          if (data.industry) setIndustry(data.industry);
+          if (data.what_you_sell) setWhatYouSell(data.what_you_sell);
+          if (data.location) setLocation(data.location);
+          if (data.website) setWebsite(data.website);
+          if (data.brand_tone) setBrandTone(data.brand_tone);
+          if (data.target_audience) setTargetAudience(data.target_audience);
         }
+      } catch (err) {
+        console.warn("Local brand profile load error:", err);
+      }
+
+      // 2. Fetch from Supabase profiles if authenticated
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+          if (data && data.business_name) {
+            setBusinessName(data.business_name || "");
+            setIndustry(data.industry || "");
+            setWhatYouSell(data.what_you_sell || "");
+            setLocation(data.location || "");
+            setWebsite(data.website || "");
+            setBrandTone(data.brand_tone || "Friendly");
+            setTargetAudience(data.target_audience || "");
+
+            localStorage.setItem("cp_brand_profile", JSON.stringify(data));
+          }
+        }
+      } catch (err) {
+        console.warn("Supabase profile load error:", err);
       }
     }
     load();
@@ -46,20 +70,37 @@ export default function BrandProfilePage() {
     setLoading(true);
     setSaved(false);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      await supabase
-        .from("profiles")
-        .update({
-          business_name: businessName,
-          industry,
-          what_you_sell: whatYouSell,
-          location,
-          website,
-          brand_tone: brandTone,
-          target_audience: targetAudience,
-        })
-        .eq("id", user.id);
+    const profileData = {
+      business_name: businessName,
+      industry,
+      what_you_sell: whatYouSell,
+      location,
+      website,
+      brand_tone: brandTone,
+      target_audience: targetAudience,
+      updated_at: new Date().toISOString(),
+    };
+
+    // 1. Always persist to localStorage
+    try {
+      localStorage.setItem("cp_brand_profile", JSON.stringify(profileData));
+    } catch (err) {
+      console.warn("localStorage brand profile write error:", err);
+    }
+
+    // 2. Upsert to Supabase profiles table
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            ...profileData,
+          }, { onConflict: "id" });
+      }
+    } catch (err) {
+      console.warn("Supabase profile save error:", err);
     }
 
     setSaved(true);

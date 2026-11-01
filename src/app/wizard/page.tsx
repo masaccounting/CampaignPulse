@@ -50,31 +50,91 @@ export default function WizardPage() {
     "Facebook",
   ]);
 
+  // Persist Brand Profile to both localStorage and Supabase profiles table
+  async function persistBrandProfile() {
+    const profileData = {
+      business_name: businessName,
+      industry,
+      what_you_sell: whatYouSell,
+      location,
+      website,
+      brand_tone: brandTone,
+      target_audience: targetAudienceDesc,
+      updated_at: new Date().toISOString(),
+    };
+
+    // 1. Immediately persist locally so it is saved instantly
+    try {
+      localStorage.setItem("cp_brand_profile", JSON.stringify(profileData));
+    } catch (e) {
+      console.warn("localStorage brand profile write error:", e);
+    }
+
+    // 2. Persist to Supabase if authenticated with upsert
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            ...profileData,
+          }, { onConflict: "id" });
+      }
+    } catch (e) {
+      console.warn("Supabase profile save error:", e);
+    }
+  }
+
   // Load saved Brand Profile on mount if available
   useEffect(() => {
     async function loadBrandProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        if (profile && profile.business_name) {
-          setBusinessName(profile.business_name || "");
-          setIndustry(profile.industry || "");
-          setWhatYouSell(profile.what_you_sell || "");
-          setLocation(profile.location || "");
-          setWebsite(profile.website || "");
+      // 1. Check local storage first
+      try {
+        const local = localStorage.getItem("cp_brand_profile");
+        if (local) {
+          const profile = JSON.parse(local);
+          if (profile.business_name) setBusinessName(profile.business_name);
+          if (profile.industry) setIndustry(profile.industry);
+          if (profile.what_you_sell) setWhatYouSell(profile.what_you_sell);
+          if (profile.location) setLocation(profile.location);
+          if (profile.website) setWebsite(profile.website);
           if (profile.brand_tone) setBrandTone(profile.brand_tone);
           if (profile.target_audience) setTargetAudienceDesc(profile.target_audience);
         }
+      } catch (e) {
+        console.warn("Local brand profile load error:", e);
+      }
+
+      // 2. Fetch from Supabase profiles if authenticated
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+          if (profile && profile.business_name) {
+            setBusinessName(profile.business_name || "");
+            setIndustry(profile.industry || "");
+            setWhatYouSell(profile.what_you_sell || "");
+            setLocation(profile.location || "");
+            setWebsite(profile.website || "");
+            if (profile.brand_tone) setBrandTone(profile.brand_tone);
+            if (profile.target_audience) setTargetAudienceDesc(profile.target_audience);
+
+            localStorage.setItem("cp_brand_profile", JSON.stringify(profile));
+          }
+        }
+      } catch (e) {
+        console.warn("Supabase profile load warning:", e);
       }
     }
     loadBrandProfile();
   }, []);
 
-  // Sample Businesses pool for "Try an Example" (rotates across 10 diverse small businesses)
+  // Sample Businesses pool for "Try an Example" (rotates across 20 diverse small businesses)
   const sampleBusinesses = [
     {
       name: "Bella Artisan Bakery",
@@ -208,7 +268,7 @@ export default function WizardPage() {
       whatYouSell: "Direct-trade micro-lot coffee beans, velvety espresso drinks, and house-made cold brew flights.",
       location: "Seattle, Washington",
       website: "https://velvetvinecoffeeexample.com",
-      tone: "Warm & Welcoming",
+      tone: "Friendly",
       audienceDesc: "Specialty coffee connoisseurs, remote workers, students, and morning commuters who love fine roasts.",
       ageRange: "21 - 48",
       interests: "Single-origin pour-overs, cozy third spaces, ethical trade, indie bookshops, local musicians.",
@@ -226,7 +286,7 @@ export default function WizardPage() {
       whatYouSell: "Gentle preventative cleanings, clear teeth aligners, painless cosmetic whitening, and comfort dentistry.",
       location: "Tampa, Florida",
       website: "https://radiantsmiledentalexample.com",
-      tone: "Calm & Reassuring",
+      tone: "Calm",
       audienceDesc: "Adults, working professionals, and families who want gentle, anxiety-free dental appointments.",
       ageRange: "24 - 58",
       interests: "Health & wellness, self-care routines, confident smiles, painless treatments, modern clinic comforts.",
@@ -244,7 +304,7 @@ export default function WizardPage() {
       whatYouSell: "Nature-based early childhood learning, Montessori preschool classrooms, and hands-on weekend STEM camps.",
       location: "Minneapolis, Minnesota",
       website: "https://honeybeeacademyexample.com",
-      tone: "Playful & Nurturing",
+      tone: "Playful",
       audienceDesc: "Young parents and working guardians seeking a safe, inspiring, screen-free learning environment for their kids.",
       ageRange: "26 - 45",
       interests: "Early childhood development, outdoor play, STEM education, creative arts, healthy organic lunches.",
@@ -255,6 +315,186 @@ export default function WizardPage() {
       duration: 4,
       postsPerWeek: 4,
       channels: ["Facebook", "Instagram", "Email"],
+    },
+    {
+      name: "Oak & Iron Custom Woodworking & Cabinetry",
+      industry: "Home Improvement & Custom Carpentry",
+      whatYouSell: "Handcrafted live-edge dining tables, custom kitchen cabinetry, and built-in architectural shelving.",
+      location: "Denver, Colorado",
+      website: "https://oakandironwoodexample.com",
+      tone: "Luxury",
+      audienceDesc: "Homeowners remodeling their spaces, interior designers, and families seeking heirloom-quality solid wood furniture.",
+      ageRange: "30 - 62",
+      interests: "Interior design, sustainable hardwood, home architecture, Scandinavian modern decor, artisanal craftsmanship.",
+      problem: "Frustrated by disposable flat-pack furniture that breaks quickly and wanting durable, custom-fit solid wood pieces.",
+      goal: "Get Leads",
+      customGoal: "Generate 15 qualified custom kitchen and dining table commission inquiries this month.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["Instagram", "Facebook", "Google Ads"],
+    },
+    {
+      name: "BrightPath Pediatric Occupational Therapy",
+      industry: "Healthcare & Child Development",
+      whatYouSell: "Sensory integration therapy, fine motor skill coaching, and pediatric developmental assessments.",
+      location: "Austin, Texas",
+      website: "https://brightpaththerapyexample.com",
+      tone: "Calm",
+      audienceDesc: "Parents of toddlers and young children, pediatricians, and teachers seeking developmental support.",
+      ageRange: "28 - 50",
+      interests: "Child wellness, gentle parenting, sensory play, early childhood education, neurodiversity support.",
+      problem: "Feeling anxious about developmental milestones and needing compassionate, play-based sensory therapy for their child.",
+      goal: "Get Leads",
+      customGoal: "Book 20 initial child developmental sensory evaluations with our licensed pediatric team.",
+      budget: "low",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["Facebook", "Instagram", "Email"],
+    },
+    {
+      name: "Horizon Auto Repair & Hybrid Diagnostics",
+      industry: "Automotive Care & Diagnostics",
+      whatYouSell: "Digital vehicle inspections, EV/hybrid battery diagnostics, brake service, and factory scheduled maintenance.",
+      location: "Minneapolis, Minnesota",
+      website: "https://horizonautorepairexample.com",
+      tone: "Professional",
+      audienceDesc: "Local commuters, hybrid and EV vehicle owners, and families wanting honest, transparent mechanical care.",
+      ageRange: "25 - 65",
+      interests: "Car maintenance, road trips, fuel efficiency, hybrid tech, reliable local service.",
+      problem: "Distrust of dealership repair markups and unexpected repair surprise charges.",
+      goal: "Increase Sales",
+      customGoal: "Fill our Tuesday-Thursday service bays with our complimentary 40-Point Digital Safety Inspection.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Google Ads", "Facebook", "Email"],
+    },
+    {
+      name: "Velvet & Vine Boutique Floral Studio",
+      industry: "Floral Design & Special Events",
+      whatYouSell: "Artisanal weekly floral subscriptions, luxury wedding florals, and private centerpiece arranging workshops.",
+      location: "Nashville, Tennessee",
+      website: "https://velvetandvinefloralexample.com",
+      tone: "Luxury",
+      audienceDesc: "Newly engaged couples, event planners, hospitality venues, and luxury home decorators.",
+      ageRange: "24 - 55",
+      interests: "Wedding aesthetics, seasonal flowers, botanical styling, dinner parties, luxury gifting.",
+      problem: "Cookie-cutter supermarket bouquets that wilt in 48 hours and lack artistic curation.",
+      goal: "Promote an Event",
+      customGoal: "Book out our Spring Bridal Floral Showcase and sign 12 luxury wedding floral contracts.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Instagram", "TikTok", "Email"],
+    },
+    {
+      name: "Silverline CPA & Tax Advisory",
+      industry: "Professional & Accounting Services",
+      whatYouSell: "Proactive S-Corp tax strategy, fractional CFO advisory, and automated payroll for 6-7 figure business owners.",
+      location: "Dallas, Texas",
+      website: "https://silverlinetaxcpaexample.com",
+      tone: "Professional",
+      audienceDesc: "Small business founders, medical practice owners, real estate investors, and independent consultants.",
+      ageRange: "32 - 60",
+      interests: "Tax efficiency, wealth building, business scaling, cash flow optimization, legal deductions.",
+      problem: "Overpaying thousands in avoidable taxes every April due to reactive, end-of-year tax prep.",
+      goal: "Get Leads",
+      customGoal: "Schedule 25 complimentary 20-minute Tax Savings Audits for local business owners.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["LinkedIn", "Email", "Google Ads"],
+    },
+    {
+      name: "Prism Media Video & Brand Photography",
+      industry: "Creative Media & Video Production",
+      whatYouSell: "High-conversion commercial video ads, brand storytelling reels, and executive founder headshots.",
+      location: "Atlanta, Georgia",
+      website: "https://prismmediavideoplace.com",
+      tone: "Bold",
+      audienceDesc: "E-commerce brand founders, service professionals, local business owners, and marketing directors.",
+      ageRange: "26 - 52",
+      interests: "Content creation, video marketing, cinematography, social media advertising, storytelling.",
+      problem: "Struggling with amateur DIY phone videos that don't convert viewers into paying customers.",
+      goal: "Brand Awareness",
+      customGoal: "Book 8 full-day commercial brand shoot packages with our Q2 Content Creator Bundle.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["Instagram", "LinkedIn", "YouTube"],
+    },
+    {
+      name: "ClearSky Window Cleaning & Pressure Washing",
+      industry: "Home Services & Exterior Cleaning",
+      whatYouSell: "Pure-water streak-free exterior window cleaning, soft-wash house washing, and gutter clearing.",
+      location: "Tampa, Florida",
+      website: "https://clearskycleaningexample.com",
+      tone: "Friendly",
+      audienceDesc: "Suburban homeowners, HOA board members, property managers, and real estate agents preparing listings.",
+      ageRange: "30 - 70",
+      interests: "Home curb appeal, property maintenance, spring cleaning, outdoor living spaces.",
+      problem: "Dangerous ladder climbing and stubborn grime on high second-story windows and patio pavers.",
+      goal: "Increase Sales",
+      customGoal: "Generate 40 seasonal exterior spring home refresh quote requests in our primary county.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Facebook", "Google Ads", "Instagram"],
+    },
+    {
+      name: "Zenith Martial Arts & Self-Defense Academy",
+      industry: "Fitness, Martial Arts & Youth Sports",
+      whatYouSell: "Kids character-building Brazilian Jiu-Jitsu, adult self-defense classes, and anti-bullying workshops.",
+      location: "San Diego, California",
+      website: "https://zenithmartialartsexample.com",
+      tone: "Bold",
+      audienceDesc: "Parents wanting focus and discipline for their kids, and adults looking for functional fitness and confidence.",
+      ageRange: "6 - 45",
+      interests: "Martial arts, personal safety, youth discipline, fitness, mental toughness, family activities.",
+      problem: "Kids glued to screens, low physical confidence, and wanting a safe, disciplined after-school activity.",
+      goal: "Get Leads",
+      customGoal: "Enroll 30 new students into our 4-Week Beginner Trial & Free Uniform program.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Facebook", "Instagram", "Google Ads"],
+    },
+    {
+      name: "Haven & Hearth Interior Design Studio",
+      industry: "Interior Design & Home Staging",
+      whatYouSell: "Full-service residential interior design, 3D space planning, furniture procurement, and styling.",
+      location: "Chicago, Illinois",
+      website: "https://havenandhearthdesignexample.com",
+      tone: "Luxury",
+      audienceDesc: "New home buyers, condo renovators, and busy executives looking to elevate their living environments.",
+      ageRange: "30 - 58",
+      interests: "High-end architecture, custom furniture, lighting design, home organization, modern living.",
+      problem: "Feeling overwhelmed by furniture scale, paint samples, and contractor coordination.",
+      goal: "Get Leads",
+      customGoal: "Secure 10 new whole-home interior design consultation bookings for summer projects.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["Instagram", "Facebook", "Email"],
+    },
+    {
+      name: "Cornerstone Family Law & Mediation Group",
+      industry: "Legal Services & Family Mediation",
+      whatYouSell: "Compassionate divorce mediation, child custody representation, and family estate succession.",
+      location: "Scottsdale, Arizona",
+      website: "https://cornerstonefamilylawexample.com",
+      tone: "Professional",
+      audienceDesc: "Spouses and parents seeking respectful, low-conflict mediation and experienced family legal guidance.",
+      ageRange: "28 - 60",
+      interests: "Family wellness, peaceful conflict resolution, co-parenting tips, estate protection.",
+      problem: "Anxiety over contentious, expensive court battles and wanting a dignified, private resolution.",
+      goal: "Get Leads",
+      customGoal: "Book 14 confidential family mediation consultations with our senior partners.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["LinkedIn", "Google Ads", "Facebook"],
     },
   ];
 
@@ -380,26 +620,6 @@ export default function WizardPage() {
           filtered.unshift({ ...campaignPayload, id: newCampaign.id });
           localStorage.setItem("cp_user_campaigns", JSON.stringify(filtered));
         }
-
-        // Optionally update Brand Profile
-        if (saveToBrandProfile) {
-          try {
-            await supabase
-              .from("profiles")
-              .update({
-                business_name: businessName,
-                industry,
-                what_you_sell: whatYouSell,
-                location,
-                website,
-                brand_tone: brandTone,
-                target_audience: targetAudienceDesc,
-              })
-              .eq("id", user.id);
-          } catch {
-            // Profile update fallback handled
-          }
-        }
       } else {
         // Guest Demo Mode: Save locally
         const guestId = "demo-" + Date.now();
@@ -407,6 +627,11 @@ export default function WizardPage() {
         const existingDemo = JSON.parse(localStorage.getItem("cp_demo_campaigns") || "[]");
         existingDemo.unshift({ ...campaignPayload, id: guestId });
         localStorage.setItem("cp_demo_campaigns", JSON.stringify(existingDemo));
+      }
+
+      // Persist to Brand Profile if checked
+      if (saveToBrandProfile) {
+        await persistBrandProfile();
       }
 
       // Proceed to Calendar view (Stage 4)
@@ -586,7 +811,13 @@ export default function WizardPage() {
                   <input
                     type="checkbox"
                     checked={saveToBrandProfile}
-                    onChange={(e) => setSaveToBrandProfile(e.target.checked)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setSaveToBrandProfile(checked);
+                      if (checked && businessName.trim()) {
+                        persistBrandProfile();
+                      }
+                    }}
                     className="w-4 h-4 rounded text-[#0E7C86] focus:ring-[#0E7C86]"
                   />
                   <span>Save this business brief to my Brand Profile for future campaigns</span>
@@ -851,9 +1082,14 @@ export default function WizardPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (step === 1 && !businessName.trim()) {
-                    setErrorMsg("Please enter a business name (or click 'Try an example' above).");
-                    return;
+                  if (step === 1) {
+                    if (!businessName.trim()) {
+                      setErrorMsg("Please enter a business name (or click 'Try an example' above).");
+                      return;
+                    }
+                    if (saveToBrandProfile) {
+                      persistBrandProfile();
+                    }
                   }
                   setErrorMsg(null);
                   setStep(step + 1);
