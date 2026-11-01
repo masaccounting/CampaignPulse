@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getDemoEmail } from "@/utils/demo";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LocalCampaignsSection from "@/components/LocalCampaignsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -191,6 +192,9 @@ export default async function DashboardPage() {
               </Link>
             </div>
           )}
+
+          {/* Local Campaigns Fallback for Demo Sessions */}
+          <LocalCampaignsSection hasDbCampaigns={Boolean(campaigns && campaigns.length > 0)} />
         </section>
       </main>
 

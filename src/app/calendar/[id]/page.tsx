@@ -54,44 +54,19 @@ export default function CalendarPage() {
   async function saveCampaignToDashboard() {
     setSaveStatus("saving");
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const res = await fetch("/api/campaigns/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          campaignId,
+          campaign,
+          items,
+        }),
+      });
 
-      if (user && campaign) {
-        // Ensure campaign is saved in Supabase
-        await supabase
-          .from("campaigns")
-          .upsert({
-            id: campaignId,
-            user_id: user.id,
-            title: campaign.title || "My Marketing Campaign",
-            business_name: campaign.business_name || "My Business",
-            goal: campaign.goal || "Increase Sales",
-            brand_tone: campaign.brand_tone || "Friendly",
-            duration_weeks: campaign.duration_weeks || 4,
-            posts_per_week: campaign.posts_per_week || 4,
-            start_date: campaign.start_date || new Date().toISOString().split("T")[0],
-            status: "active",
-          });
-
-        // Save items
-        if (items && items.length > 0) {
-          const toInsert = items.map((it, idx) => ({
-            campaign_id: campaignId,
-            user_id: user.id,
-            post_date: it.post_date,
-            channel: it.channel,
-            content_type: it.content_type,
-            title: it.title,
-            idea_summary: it.idea_summary,
-            status: it.status,
-            order_index: idx,
-          }));
-          try {
-            await supabase.from("calendar_items").upsert(toInsert, { onConflict: "id" });
-          } catch {
-            // Non-critical items persist error handled
-          }
-        }
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save campaign");
       }
 
       // Also persist locally in user's saved campaigns
