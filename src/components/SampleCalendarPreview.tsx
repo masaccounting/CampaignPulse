@@ -361,7 +361,7 @@ export const SAMPLE_POSTS: SamplePost[] = [
     modalContent: {
       ideas: [
         "Poll option 1: Classic Cherry Almond Galette vs Option 2: Lemon Blueberry Hand Pies.",
-        "Offer a free 4-pack to one random voter who leaves a comment.",
+        "Offer a free 4-pack to one random community member who leaves a comment.",
         "Drive community comments and algorithm visibility ahead of Saturday morning sales.",
       ],
       script: {
