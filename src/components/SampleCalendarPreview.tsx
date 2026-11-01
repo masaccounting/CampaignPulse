@@ -860,7 +860,7 @@ export default function SampleCalendarPreview() {
             ⚡
           </div>
           <p className="text-xs text-[#374151] max-w-xl">
-            <strong className="text-[#1F2937]">In your own custom calendar:</strong> You can drag dates, rewrite titles, click any post to generate fresh AI ad scripts, social captions, and export directly to CSV. (This interactive preview is a static demonstration).
+            This interactive preview is a demonstration. Click below to create your own custom marketing calendar tailored to your business.
           </p>
         </div>
         <Link
