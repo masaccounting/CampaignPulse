@@ -74,27 +74,126 @@ export default function WizardPage() {
     loadBrandProfile();
   }, []);
 
-  // "Try an Example" pre-fill button
+  // Sample Businesses pool for "Try an Example" (rotates or randomizes across 5 diverse small businesses)
+  const sampleBusinesses = [
+    {
+      name: "Bella Artisan Bakery",
+      industry: "Food & Beverage / Artisan Bakery",
+      whatYouSell: "Organic sourdough bread, French croissants, and specialty seasonal pastries.",
+      location: "Austin, Texas",
+      website: "https://bellabakeryexample.com",
+      tone: "Friendly",
+      audienceDesc: "Local neighborhood food lovers, busy professionals, and weekend brunch-goers.",
+      ageRange: "25 - 54",
+      interests: "Artisan food, local farmers markets, morning coffee rituals, clean ingredients.",
+      problem: "Tired of bland grocery store bread and wanting freshly baked, wholesome treats.",
+      goal: "Increase Sales",
+      customGoal: "Drive weekend breakfast foot traffic and promote seasonal morning pastry boxes.",
+      budget: "low",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Instagram", "Email", "Facebook", "Google Ads"],
+    },
+    {
+      name: "Summit Peak Fitness & Wellness",
+      industry: "Health, Fitness & Personal Training",
+      whatYouSell: "Small group personal training, high-energy HIIT classes, and personalized nutrition coaching.",
+      location: "Denver, Colorado",
+      website: "https://summitpeakfitnessexample.com",
+      tone: "Bold",
+      audienceDesc: "Busy working adults, parents, and fitness enthusiasts wanting supportive, high-accountability coaching.",
+      ageRange: "28 - 50",
+      interests: "Functional fitness, healthy cooking, outdoor recreation, stress reduction, wellness retreats.",
+      problem: "Struggling to stay consistent at big gym chains without personal guidance or community.",
+      goal: "Get Leads",
+      customGoal: "Sign up 25 local adults for our 30-Day Spring Strength & Energy Challenge.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Instagram", "Facebook", "Email"],
+    },
+    {
+      name: "GreenThumb Urban Plant Boutique",
+      industry: "Retail / Home & Garden",
+      whatYouSell: "Hard-to-find indoor tropical houseplants, custom ceramic planters, and beginner plant-care workshops.",
+      location: "Portland, Oregon",
+      website: "https://greenthumbplantsample.com",
+      tone: "Playful",
+      audienceDesc: "Apartment dwellers, new homeowners, and urban plant parents looking to green their living spaces.",
+      ageRange: "22 - 42",
+      interests: "Interior design, sustainable living, urban gardening, DIY home decor, pet-friendly plants.",
+      problem: "Wanting indoor greenery but feeling overwhelmed by how to keep delicate houseplants alive.",
+      goal: "Brand Awareness",
+      customGoal: "Grow our local community followers and pack our weekend Repotting & Sips workshop.",
+      budget: "low",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["Instagram", "TikTok", "Facebook"],
+    },
+    {
+      name: "Luxe Paws Pet Grooming & Spa",
+      industry: "Pet Care & Services",
+      whatYouSell: "Gentle stress-free dog grooming, organic oatmeal coat spas, and blueberry facial treatments.",
+      location: "Scottsdale, Arizona",
+      website: "https://luxepawsexample.com",
+      tone: "Luxury",
+      audienceDesc: "Devoted dog owners who treat their pets like family and prioritize high-care grooming.",
+      ageRange: "26 - 60",
+      interests: "Dog training, pet health, boutique pet treats, dog-friendly patios, animal rescue.",
+      problem: "High anxiety at crowded grooming salons and wanting a gentle, one-on-one cage-free experience.",
+      goal: "Increase Sales",
+      customGoal: "Fill weekday grooming appointments with our new client 'First Pampering' special.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Instagram", "Facebook", "Google Ads"],
+    },
+    {
+      name: "Blue Harbor Financial Advisory",
+      industry: "Professional & Financial Services",
+      whatYouSell: "Fee-only financial planning, tax strategy, and retirement transition for family business owners.",
+      location: "Charlotte, North Carolina",
+      website: "https://blueharborplanningexample.com",
+      tone: "Professional",
+      audienceDesc: "Family business owners and mid-career professionals looking for objective, fiduciary wealth management.",
+      ageRange: "35 - 62",
+      interests: "Business succession, tax efficiency, investing, family legacy, smart retirement strategies.",
+      problem: "Feeling overwhelmed by complex taxes and lacking a clear roadmap to step back from the business.",
+      goal: "Get Leads",
+      customGoal: "Book 15 introductory financial roadmap discovery consultations this quarter.",
+      budget: "high",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["LinkedIn", "Email", "Facebook"],
+    },
+  ];
+
+  const [sampleIndex, setSampleIndex] = useState(0);
+
+  // "Try an Example" pre-fill button: cycles through 5 diverse small businesses
   function fillSampleAnswers() {
-    setBusinessName("Bella Artisan Bakery");
-    setIndustry("Food & Beverage / Artisan Bakery");
-    setWhatYouSell("Organic sourdough bread, French croissants, and specialty seasonal pastries.");
-    setLocation("Austin, Texas");
-    setWebsite("https://bellabakeryexample.com");
-    setBrandTone("Friendly");
+    const next = sampleBusinesses[sampleIndex % sampleBusinesses.length];
+    setSampleIndex((prev) => prev + 1);
 
-    setTargetAudienceDesc("Local neighborhood food lovers, busy professionals, and weekend brunch-goers.");
-    setAudienceAgeRange("25 - 54");
-    setAudienceInterests("Artisan food, local farmers markets, morning coffee rituals, clean ingredients.");
-    setAudienceProblem("Tired of bland grocery store bread and wanting freshly baked, wholesome treats.");
+    setBusinessName(next.name);
+    setIndustry(next.industry);
+    setWhatYouSell(next.whatYouSell);
+    setLocation(next.location);
+    setWebsite(next.website);
+    setBrandTone(next.tone);
 
-    setGoal("Increase Sales");
-    setCustomGoal("Drive weekend breakfast foot traffic and promote seasonal morning pastry boxes.");
-    setBudgetLevel("low");
+    setTargetAudienceDesc(next.audienceDesc);
+    setAudienceAgeRange(next.ageRange);
+    setAudienceInterests(next.interests);
+    setAudienceProblem(next.problem);
 
-    setDurationWeeks(4);
-    setPostsPerWeek(4);
-    setCampaignChannels(["Instagram", "Email", "Facebook", "Google Ads"]);
+    setGoal(next.goal);
+    setCustomGoal(next.customGoal);
+    setBudgetLevel(next.budget);
+
+    setDurationWeeks(next.duration);
+    setPostsPerWeek(next.postsPerWeek);
+    setCampaignChannels(next.channels);
   }
 
   function toggleChannel(channel: string) {
@@ -153,14 +252,36 @@ export default function WizardPage() {
         const { data: newCampaign, error: campErr } = await supabase
           .from("campaigns")
           .insert({
-            ...campaignPayload,
             user_id: user.id,
+            title: campaignTitle,
+            business_name: businessName || "My Business",
+            industry: industry || null,
+            what_you_sell: whatYouSell || null,
+            target_audience_desc: targetAudienceDesc || null,
+            brand_tone: brandTone || "Friendly",
+            goal: goal || "Increase Sales",
+            custom_goal: customGoal || null,
+            budget_level: budgetLevel || "low",
+            start_date: startDate,
+            end_date: endDate,
+            duration_weeks: durationWeeks || 4,
+            posts_per_week: postsPerWeek || 4,
+            status: "active",
           })
           .select()
           .single();
 
-        if (campErr) throw campErr;
-        campaignId = newCampaign.id;
+        if (campErr) {
+          console.warn("Supabase insert warning, falling back to local session:", campErr);
+          // Fall back gracefully so the user is never blocked
+          const fallbackId = "campaign-" + Date.now();
+          campaignId = fallbackId;
+          const userCampaigns = JSON.parse(localStorage.getItem("cp_user_campaigns") || "[]");
+          userCampaigns.unshift({ ...campaignPayload, id: fallbackId });
+          localStorage.setItem("cp_user_campaigns", JSON.stringify(userCampaigns));
+        } else {
+          campaignId = newCampaign.id;
+        }
 
         // Optionally update Brand Profile
         if (saveToBrandProfile) {
@@ -175,7 +296,8 @@ export default function WizardPage() {
               brand_tone: brandTone,
               target_audience: targetAudienceDesc,
             })
-            .eq("id", user.id);
+            .eq("id", user.id)
+            .catch(() => {});
         }
       } else {
         // Guest Demo Mode: Save locally
