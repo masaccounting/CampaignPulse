@@ -48,6 +48,65 @@ export default function CalendarPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<Record<string, string>>({});
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+
+  // Save campaign to user profile / dashboard
+  async function saveCampaignToDashboard() {
+    setSaveStatus("saving");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user && campaign) {
+        // Ensure campaign is saved in Supabase
+        await supabase
+          .from("campaigns")
+          .upsert({
+            id: campaignId,
+            user_id: user.id,
+            title: campaign.title || "My Marketing Campaign",
+            business_name: campaign.business_name || "My Business",
+            goal: campaign.goal || "Increase Sales",
+            brand_tone: campaign.brand_tone || "Friendly",
+            duration_weeks: campaign.duration_weeks || 4,
+            posts_per_week: campaign.posts_per_week || 4,
+            start_date: campaign.start_date || new Date().toISOString().split("T")[0],
+            status: "active",
+          });
+
+        // Save items
+        if (items && items.length > 0) {
+          const toInsert = items.map((it, idx) => ({
+            campaign_id: campaignId,
+            user_id: user.id,
+            post_date: it.post_date,
+            channel: it.channel,
+            content_type: it.content_type,
+            title: it.title,
+            idea_summary: it.idea_summary,
+            status: it.status,
+            order_index: idx,
+          }));
+          try {
+            await supabase.from("calendar_items").upsert(toInsert, { onConflict: "id" });
+          } catch {
+            // Non-critical items persist error handled
+          }
+        }
+      }
+
+      // Also persist locally in user's saved campaigns
+      const savedCampaigns = JSON.parse(localStorage.getItem("cp_user_campaigns") || "[]");
+      const filtered = savedCampaigns.filter((c: CampaignData) => c.id !== campaignId);
+      filtered.unshift({ ...campaign, id: campaignId, itemsCount: items.length });
+      localStorage.setItem("cp_user_campaigns", JSON.stringify(filtered));
+
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    } catch (e) {
+      console.error("Failed to save campaign:", e);
+      setSaveStatus("idle");
+    }
+  }
 
   // Generate calendar items based on duration, channels, and cadence
   async function generateInitialCalendar(camp: CampaignData) {
@@ -380,8 +439,33 @@ export default function CalendarPage() {
             </div>
 
             <button
+              type="button"
+              onClick={saveCampaignToDashboard}
+              disabled={saveStatus === "saving"}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
+                saveStatus === "saved"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-[#0E7C86] hover:bg-[#0a5f67] text-white"
+              }`}
+            >
+              {saveStatus === "saving" ? (
+                <span>Saving...</span>
+              ) : saveStatus === "saved" ? (
+                <>
+                  <span>✓</span>
+                  <span>Campaign Saved!</span>
+                </>
+              ) : (
+                <>
+                  <span>💾</span>
+                  <span>Save Campaign</span>
+                </>
+              )}
+            </button>
+
+            <button
               onClick={() => window.print()}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-[#4B5563] bg-white border border-[#F3E8E2] hover:bg-[#F3E8E2]"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-[#4B5563] bg-white border border-[#F3E8E2] hover:bg-[#F3E8E2] cursor-pointer min-h-[36px]"
             >
               🖨️ Export / Print
             </button>

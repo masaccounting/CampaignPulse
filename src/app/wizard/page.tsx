@@ -74,7 +74,7 @@ export default function WizardPage() {
     loadBrandProfile();
   }, []);
 
-  // Sample Businesses pool for "Try an Example" (rotates or randomizes across 5 diverse small businesses)
+  // Sample Businesses pool for "Try an Example" (rotates across 10 diverse small businesses)
   const sampleBusinesses = [
     {
       name: "Bella Artisan Bakery",
@@ -166,15 +166,106 @@ export default function WizardPage() {
       postsPerWeek: 3,
       channels: ["LinkedIn", "Email", "Facebook"],
     },
+    {
+      name: "Sunburst Solar & Clean Energy",
+      industry: "Home Services & Clean Energy",
+      whatYouSell: "Residential rooftop solar panel installation, backup home battery systems, and energy audits.",
+      location: "San Diego, California",
+      website: "https://sunburstsolarexample.com",
+      tone: "Professional",
+      audienceDesc: "Suburban homeowners tired of skyrocketing electric utility bills and power grid blackouts.",
+      ageRange: "30 - 65",
+      interests: "Home improvement, clean technology, energy independence, smart home automation, tax credits.",
+      problem: "Unpredictable utility rate hikes and confusion about high-pressure door-to-door solar sales.",
+      goal: "Get Leads",
+      customGoal: "Generate 30 qualified home solar roof audit bookings from neighborhood homeowners.",
+      budget: "high",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Facebook", "Google Ads", "Email"],
+    },
+    {
+      name: "Copper & Oak Barbershop & Grooming",
+      industry: "Personal Care & Barbering",
+      whatYouSell: "Precision haircuts, straight-razor hot towel shaves, beard sculpting, and premium grooming oils.",
+      location: "Nashville, Tennessee",
+      website: "https://copperoakbarberexample.com",
+      tone: "Bold",
+      audienceDesc: "Gentlemen, working professionals, and groomsmen who appreciate classic barber traditions with craft care.",
+      ageRange: "20 - 55",
+      interests: "Men's style, classic craft, local music, craft bourbon, beard maintenance, traditional grooming.",
+      problem: "Rushed, impersonal 10-minute haircuts at discount chains that leave you unsatisfied.",
+      goal: "Increase Sales",
+      customGoal: "Fill our weekday chair schedule and introduce our handcrafted sandalwood beard care kit.",
+      budget: "low",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Instagram", "Google Ads", "Facebook"],
+    },
+    {
+      name: "Velvet Vine Artisan Coffee & Roastery",
+      industry: "Specialty Coffee & Cafe",
+      whatYouSell: "Direct-trade micro-lot coffee beans, velvety espresso drinks, and house-made cold brew flights.",
+      location: "Seattle, Washington",
+      website: "https://velvetvinecoffeeexample.com",
+      tone: "Warm & Welcoming",
+      audienceDesc: "Specialty coffee connoisseurs, remote workers, students, and morning commuters who love fine roasts.",
+      ageRange: "21 - 48",
+      interests: "Single-origin pour-overs, cozy third spaces, ethical trade, indie bookshops, local musicians.",
+      problem: "Burnt corporate chain coffee with zero traceability and noisy, uninspiring seating.",
+      goal: "Brand Awareness",
+      customGoal: "Grow weekly subscription bean deliveries and launch our Saturday Morning Cupping & Tasting hours.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Instagram", "TikTok", "Email"],
+    },
+    {
+      name: "Radiant Smile Modern Dental Studio",
+      industry: "Healthcare & Dental Care",
+      whatYouSell: "Gentle preventative cleanings, clear teeth aligners, painless cosmetic whitening, and comfort dentistry.",
+      location: "Tampa, Florida",
+      website: "https://radiantsmiledentalexample.com",
+      tone: "Calm & Reassuring",
+      audienceDesc: "Adults, working professionals, and families who want gentle, anxiety-free dental appointments.",
+      ageRange: "24 - 58",
+      interests: "Health & wellness, self-care routines, confident smiles, painless treatments, modern clinic comforts.",
+      problem: "Dental anxiety, outdated noisy dental equipment, and fear of judgment or high out-of-pocket bills.",
+      goal: "Get Leads",
+      customGoal: "Attract 20 new adult patient cleanings with our complimentary whitening evaluation bundle.",
+      budget: "medium",
+      duration: 4,
+      postsPerWeek: 3,
+      channels: ["Google Ads", "Facebook", "Instagram"],
+    },
+    {
+      name: "Honeybee Creative Kids Academy",
+      industry: "Education & Childcare",
+      whatYouSell: "Nature-based early childhood learning, Montessori preschool classrooms, and hands-on weekend STEM camps.",
+      location: "Minneapolis, Minnesota",
+      website: "https://honeybeeacademyexample.com",
+      tone: "Playful & Nurturing",
+      audienceDesc: "Young parents and working guardians seeking a safe, inspiring, screen-free learning environment for their kids.",
+      ageRange: "26 - 45",
+      interests: "Early childhood development, outdoor play, STEM education, creative arts, healthy organic lunches.",
+      problem: "Cold, institutional daycare facilities that treat early education as simple babysitting.",
+      goal: "Get Leads",
+      customGoal: "Book 18 private campus discovery tours for upcoming Fall Pre-K and Kindergarten enrollment.",
+      budget: "low",
+      duration: 4,
+      postsPerWeek: 4,
+      channels: ["Facebook", "Instagram", "Email"],
+    },
   ];
 
   const [sampleIndex, setSampleIndex] = useState(0);
 
-  // "Try an Example" pre-fill button: cycles through 5 diverse small businesses
+  // "Try an Example" pre-fill button: immediately updates and visually populates all business inputs
   function fillSampleAnswers() {
     const next = sampleBusinesses[sampleIndex % sampleBusinesses.length];
     setSampleIndex((prev) => prev + 1);
 
+    // Step 1: Business Brief (immediately visible on current screen)
     setBusinessName(next.name);
     setIndustry(next.industry);
     setWhatYouSell(next.whatYouSell);
@@ -182,15 +273,18 @@ export default function WizardPage() {
     setWebsite(next.website);
     setBrandTone(next.tone);
 
+    // Step 2: Target Audience
     setTargetAudienceDesc(next.audienceDesc);
     setAudienceAgeRange(next.ageRange);
     setAudienceInterests(next.interests);
     setAudienceProblem(next.problem);
 
+    // Step 3: Goals & Budget
     setGoal(next.goal);
     setCustomGoal(next.customGoal);
     setBudgetLevel(next.budget);
 
+    // Step 4: Duration & Cadence
     setDurationWeeks(next.duration);
     setPostsPerWeek(next.postsPerWeek);
     setCampaignChannels(next.channels);
@@ -285,19 +379,22 @@ export default function WizardPage() {
 
         // Optionally update Brand Profile
         if (saveToBrandProfile) {
-          await supabase
-            .from("profiles")
-            .update({
-              business_name: businessName,
-              industry,
-              what_you_sell: whatYouSell,
-              location,
-              website,
-              brand_tone: brandTone,
-              target_audience: targetAudienceDesc,
-            })
-            .eq("id", user.id)
-            .catch(() => {});
+          try {
+            await supabase
+              .from("profiles")
+              .update({
+                business_name: businessName,
+                industry,
+                what_you_sell: whatYouSell,
+                location,
+                website,
+                brand_tone: brandTone,
+                target_audience: targetAudienceDesc,
+              })
+              .eq("id", user.id);
+          } catch {
+            // Profile update fallback handled
+          }
         }
       } else {
         // Guest Demo Mode: Save locally
