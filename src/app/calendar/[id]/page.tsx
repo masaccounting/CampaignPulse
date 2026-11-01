@@ -663,7 +663,7 @@ export default function CalendarPage() {
                   </div>
                 ) : generatedContent[activeTab] ? (
                   <div className="space-y-3">
-                    <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2] text-xs text-[#1F2937] leading-relaxed whitespace-pre-wrap max-h-80 overflow-y-auto">
+                    <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-[#F3E8E2] text-xs text-[#1F2937] leading-relaxed whitespace-pre-wrap max-h-[420px] overflow-y-auto">
                       {typeof generatedContent[activeTab] === "string"
                         ? generatedContent[activeTab]
                         : JSON.stringify(generatedContent[activeTab], null, 2)}

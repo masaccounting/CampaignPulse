@@ -91,15 +91,24 @@ Keep the output polished, clean, realistic, and directly actionable. Avoid fluff
     // Query Google Gemini using active models with fallback resilience
     if (apiKey) {
       const modelsToTry = [
-        "gemini-3.8-flash",
-        "gemini-3.5-flash",
-        "gemini-3.1-flash-lite",
+        { model: "gemini-3.6-flash", withThinkingConfig: true },
+        { model: "gemini-3.1-flash-lite", withThinkingConfig: true },
+        { model: "gemini-flash-lite-latest", withThinkingConfig: false },
+        { model: "gemini-3.8-flash", withThinkingConfig: true },
       ];
 
-      for (const model of modelsToTry) {
+      for (const item of modelsToTry) {
         try {
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+          const genConfig: Record<string, unknown> = {
+            temperature: 0.75,
+            maxOutputTokens: 4096,
+          };
+          if (item.withThinkingConfig) {
+            genConfig.thinkingConfig = { thinkingBudget: 0 };
+          }
+
+          let response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${item.model}:generateContent?key=${apiKey}`,
             {
               method: "POST",
               headers: {
@@ -115,20 +124,45 @@ Keep the output polished, clean, realistic, and directly actionable. Avoid fluff
                     ],
                   },
                 ],
-                generationConfig: {
-                  temperature: 0.85,
-                  maxOutputTokens: 1024,
-                },
+                generationConfig: genConfig,
               }),
             }
           );
 
+          // Retry without thinkingConfig if the model doesn't support the field
+          if (!response.ok && item.withThinkingConfig) {
+            delete genConfig.thinkingConfig;
+            response = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${item.model}:generateContent?key=${apiKey}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  contents: [
+                    {
+                      parts: [
+                        {
+                          text: systemPrompt,
+                        },
+                      ],
+                    },
+                  ],
+                  generationConfig: genConfig,
+                }),
+              }
+            );
+          }
+
           if (response.ok) {
             const geminiData = await response.json();
-            const generatedText =
-              geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+            const candidate = geminiData?.candidates?.[0];
+            const finishReason = candidate?.finishReason;
+            const generatedText = candidate?.content?.parts?.[0]?.text;
 
-            if (generatedText) {
+            // Ensure response is fully completed and not truncated by token limits
+            if (generatedText && finishReason !== "MAX_TOKENS") {
               return NextResponse.json({ result: generatedText });
             }
           }
