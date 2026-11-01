@@ -6,6 +6,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createClient } from "@/utils/supabase/client";
+import { getIndustryCategory, getCalendarTemplates } from "@/utils/industryTemplates";
 
 interface CalendarItem {
   id: string;
@@ -96,90 +97,16 @@ export default function CalendarPage() {
     const generated: CalendarItem[] = [];
     let itemId = 1;
 
-    const postTemplates: Record<string, { type: string; titles: string[]; ideas: string[] }> = {
-      Instagram: {
-        type: "Reel / Video",
-        titles: [
-          "Behind-the-Scenes Preparation",
-          "Customer Favorite Spotlight",
-          "Weekly Recipe Secret & Technique",
-          "Weekend Special Preview",
-        ],
-        ideas: [
-          "Capture the morning artisan craft with uplifting music and pure ingredients.",
-          "Highlight our signature item with customer quotes and glowing smiles.",
-          "A 20-second quick visual tip showing how we achieve crisp perfection.",
-          "High-energy video showing what is coming out of the oven this weekend.",
-        ],
-      },
-      Email: {
-        type: "Newsletter",
-        titles: [
-          "VIP Community Exclusive Perk",
-          "Weekend Reservation & Tasting Guide",
-          "Seasonal Special Announcement",
-          "A Note From Our Founder",
-        ],
-        ideas: [
-          "Reward subscribers with a special 15% VIP code valid through Sunday.",
-          "Curated weekend menu preview with easy click-to-order links.",
-          "Announce new seasonal flavors arriving this month.",
-          "A warm personal story sharing our passion for wholesome local quality.",
-        ],
-      },
-      Facebook: {
-        type: "Community Post",
-        titles: [
-          "Local Event & Gathering Announcement",
-          "Customer Story of the Week",
-          "Neighborhood Special Hours",
-          "Family Pre-Order Package Announcement",
-        ],
-        ideas: [
-          "Share our weekend gathering hours and invite local families to visit.",
-          "Celebrate a longtime regular with a warm photo and kind words.",
-          "Community update with easy parking directions and special morning hours.",
-          "Early reservations for holiday family packages with pick-up times.",
-        ],
-      },
-      "Google Ads": {
-        type: "Search Ad",
-        titles: [
-          "Top-Rated Local Artisan Treats",
-          "Fresh Daily Morning Pickup Promo",
-          "Specialty Weekend Orders",
-        ],
-        ideas: [
-          "Target active searches for artisan bakery treats within 5-mile radius.",
-          "Target morning commuters looking for fresh breakfast takeout.",
-          "Target event and celebration keyword queries in the local area.",
-        ],
-      },
-      TikTok: {
-        type: "Short Video",
-        titles: ["Dough Rising Satisfying Timelapse", "Fast Kitchen Prep Trend"],
-        ideas: [
-          "Hypnotic 15-second ASMR sourdough scoring and baking video.",
-          "Fun trending audio paired with early 5:00 AM bakery lighting.",
-        ],
-      },
-      LinkedIn: {
-        type: "Company Update",
-        titles: ["Behind Our Small Business Growth", "Why We Choose Local Sourcing"],
-        ideas: [
-          "Reflections on building a resilient small business rooted in community.",
-          "Highlighting our local farm suppliers and sustainable practices.",
-        ],
-      },
-      Blog: {
-        type: "Article",
-        titles: ["The Health Benefits of Natural Fermentation", "A Guide to Artisan Baking"],
-        ideas: [
-          "Educational blog post exploring slow fermentation and gut health.",
-          "A beginner-friendly guide to choosing the best wholesome flours.",
-        ],
-      },
-    };
+    // Resolve industry category and load dynamic, industry-tailored templates
+    const category = getIndustryCategory(
+      camp.industry as string,
+      camp.what_you_sell as string,
+      camp.business_name as string
+    );
+    const postTemplates = getCalendarTemplates(
+      category,
+      (camp.business_name as string) || "Our Business"
+    );
 
     for (let w = 0; w < weeks; w++) {
       for (let p = 0; p < postsPerWeek; p++) {
@@ -243,15 +170,24 @@ export default function CalendarPage() {
 
       if (campaignId?.startsWith("demo-")) {
         const demoCampaigns = JSON.parse(localStorage.getItem("cp_demo_campaigns") || "[]");
-        camp = demoCampaigns.find((c: CampaignData) => c.id === campaignId) || {
-          title: "Bella Artisan Bakery Spring Campaign",
-          business_name: "Bella Artisan Bakery",
-          goal: "Increase Sales",
-          start_date: new Date().toISOString().split("T")[0],
-          duration_weeks: 4,
-          posts_per_week: 4,
-          online_channels: ["Instagram", "Email", "Facebook", "Google Ads"],
-        };
+        camp = demoCampaigns.find((c: CampaignData) => c.id === campaignId) || null;
+        if (!camp) {
+          const userCampaigns = JSON.parse(localStorage.getItem("cp_user_campaigns") || "[]");
+          camp = userCampaigns.find((c: CampaignData) => c.id === campaignId) || null;
+        }
+        if (!camp) {
+          camp = {
+            title: "Custom Marketing Campaign",
+            business_name: "Local Business",
+            industry: "Healthcare & Dental",
+            what_you_sell: "Gentle family dental cleanings and cosmetic care",
+            goal: "Get Leads",
+            start_date: new Date().toISOString().split("T")[0],
+            duration_weeks: 4,
+            posts_per_week: 4,
+            online_channels: ["Instagram", "Facebook", "Email", "Google Ads"],
+          };
+        }
         existingItems = JSON.parse(localStorage.getItem(`cp_items_${campaignId}`) || "[]");
       } else {
         const { data: c } = await supabase
@@ -259,7 +195,10 @@ export default function CalendarPage() {
           .select("*")
           .eq("id", campaignId)
           .single();
-        camp = c;
+
+        const userCampaigns = JSON.parse(localStorage.getItem("cp_user_campaigns") || "[]");
+        const cached = userCampaigns.find((item: CampaignData) => item.id === campaignId);
+        camp = c ? { ...(cached || {}), ...c } : (cached || null);
 
         if (camp) {
           const { data: i } = await supabase
@@ -268,16 +207,41 @@ export default function CalendarPage() {
             .eq("campaign_id", campaignId)
             .order("post_date", { ascending: true });
           existingItems = i || [];
+
+          if (existingItems.length === 0) {
+            existingItems = JSON.parse(localStorage.getItem(`cp_items_${campaignId}`) || "[]");
+          }
         }
       }
 
       setCampaign(camp);
 
+      // Verify that existing items are not stale bakery templates from a previous bug
+      if (camp && existingItems && existingItems.length > 0) {
+        const category = getIndustryCategory(
+          camp.industry as string,
+          camp.what_you_sell as string,
+          camp.business_name as string
+        );
+        const hasBakeryArtifacts =
+          category !== "food_hospitality" &&
+          existingItems.some((it) =>
+            it.title?.match(/recipe secret|morning pickup promo|artisan treats|sourdough|baking|farm partners/i) ||
+            it.idea_summary?.match(/oven|dough|sourdough|ferment|baking|pastry|flour/i)
+          );
+
+        if (hasBakeryArtifacts) {
+          // Cleanse buggy bakery items and generate fresh, industry-accurate items
+          existingItems = [];
+          localStorage.removeItem(`cp_items_${campaignId}`);
+        }
+      }
+
       if (existingItems && existingItems.length > 0) {
         setItems(existingItems);
         setLoading(false);
       } else if (camp) {
-        // Auto-generate realistic marketing calendar items if empty
+        // Auto-generate realistic marketing calendar items if empty or cleansed
         generateInitialCalendar(camp);
       } else {
         setLoading(false);
@@ -326,6 +290,9 @@ export default function CalendarPage() {
         body: JSON.stringify({
           type,
           businessName: campaign?.business_name,
+          industry: campaign?.industry,
+          whatYouSell: campaign?.what_you_sell,
+          targetAudience: campaign?.target_audience_desc,
           goal: campaign?.goal,
           channel: selectedItem.channel,
           title: selectedItem.title,

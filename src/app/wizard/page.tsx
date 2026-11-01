@@ -375,6 +375,10 @@ export default function WizardPage() {
           localStorage.setItem("cp_user_campaigns", JSON.stringify(userCampaigns));
         } else {
           campaignId = newCampaign.id;
+          const userCampaigns = JSON.parse(localStorage.getItem("cp_user_campaigns") || "[]");
+          const filtered = userCampaigns.filter((c: { id: string }) => c.id !== newCampaign.id);
+          filtered.unshift({ ...campaignPayload, id: newCampaign.id });
+          localStorage.setItem("cp_user_campaigns", JSON.stringify(filtered));
         }
 
         // Optionally update Brand Profile
